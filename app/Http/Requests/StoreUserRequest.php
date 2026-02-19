@@ -1,7 +1,5 @@
 <?php
 
-//
-
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -9,18 +7,13 @@ use Illuminate\Validation\Rule;
 
 class StoreUserRequest extends FormRequest
 {
-    /**
-     * Autoriser la requête pour le moment
-     */
-
+    // Autoriser la requête pour le moment
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Récupérer la règle de validation à appliquer à la requête
-    */
+   // Récupérer la règle de validation à appliquer à la requête
     public function rules(): array {
         return [
             // le nom est requis (obligatoire), est un string et doit comporter au minimum 3 lettres.

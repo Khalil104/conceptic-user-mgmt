@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// import nécessaire au bon fonctionnement du modèle
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
