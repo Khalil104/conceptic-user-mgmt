@@ -80,5 +80,14 @@ class UserController extends Controller {
         }
     }
 
-    //
+    // Fonction pour supprimer un utilisateur à partir de son id
+
+    public function delete(string $id): JsonResponse {
+        try {
+            $this->userService->deleteUser($id);
+            return response()->json(["success" => true, "message" => "User deleted"], 200);
+        } catch (\Exception $e) {
+            return response()->json(["success" => false, "message" => "Delete failed"], 500);
+        }
+    }   
 } // Fin de la classe UserController

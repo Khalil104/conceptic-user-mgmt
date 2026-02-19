@@ -33,4 +33,9 @@ class UserService {
     public function updateUser(string $id, array $data) {
         return $this->userRepository->update($id, $data);
     }
+
+    //logique de suppression d'un utilisateur
+     public function deleteUser(String $id) {
+        return $this->userRepository->delete($id);
+    }
 }

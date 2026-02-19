@@ -45,4 +45,10 @@ class UserRepository {
         $user->update($data);
         return $user;
     }
+
+    // Supprimer un utilisateur à partir de son id
+    public function delete(string $id) {
+        $user = $this->findById($id);
+        return $user->delete();
+    }
 }
