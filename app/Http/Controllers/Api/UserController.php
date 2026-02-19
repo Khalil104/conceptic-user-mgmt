@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse; 
 use Illuminate\Http\Response;
@@ -68,4 +69,16 @@ class UserController extends Controller {
             return response()->json(["success" => false, "message" => "User not found"], 404);
         }
     }
+
+    //Fonction pour modifier les informations d'un utilisateur à partir de son id
+    public function update(UpdateUserRequest $request, string $id): JsonResponse {
+        try {
+            $user = $this->userService->updateUser($id, $request->validated());
+            return response()->json(["success" => true, "message" => "User updated", "data" => $user], 200);    
+        } catch (\Exception $e) {
+            return response()->json(["success" => false, "message" => "update failed"], 500);
+        }
+    }
+
+    //
 } // Fin de la classe UserController

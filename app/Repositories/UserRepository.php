@@ -38,4 +38,11 @@ class UserRepository {
     public function findById(string $id) {
         return User::findOrFail($id);
     }
+
+    // Modifier un user à partir de son id
+    public function update(string $id, array $data) {
+        $user = $this->findById($id);
+        $user->update($data);
+        return $user;
+    }
 }

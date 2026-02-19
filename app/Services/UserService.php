@@ -28,4 +28,9 @@ class UserService {
     public function getUserById(string $id) {
         return $this->userRepository->findById($id);
     }
+
+    // logique de modification d'un utilisateur via son id
+    public function updateUser(string $id, array $data) {
+        return $this->userRepository->update($id, $data);
+    }
 }

@@ -17,6 +17,10 @@ Route::post('users', [UserController::class, 'store']);
 // GET /api/users{user} -> Détail (show)
 Route::get('users/{user}', [UserController::class, 'show']);
 
+// // PUT /api/users/{user} -> Mise à jour (update)
+Route::put('users/{user}', [UserController::class, 'update']);
+
+
 // --- Route Authentifiée ---
 Route::get('/user', function (Request $request) {
     return $request->user();
