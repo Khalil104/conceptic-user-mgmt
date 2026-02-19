@@ -59,4 +59,13 @@ class UserController extends Controller {
         }
     } // fin de la fonction index()
 
+    // Fonction pour afficher les informations de l'utilisateur avec pour id::id
+    public function show(string $id): JsonResponse {
+        try {
+            $user = $this->userService->getUserById($id);
+            return response()->json(["success" => true, "data" => $user], 200);
+        } catch (\Exception $e) {
+            return response()->json(["success" => false, "message" => "User not found"], 404);
+        }
+    }
 } // Fin de la classe UserController

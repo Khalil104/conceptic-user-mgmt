@@ -34,4 +34,8 @@ class UserRepository {
         return $query->paginate(10);
     }
 
+    // Trouver un utilisateur par son UUID
+    public function findById(string $id) {
+        return User::findOrFail($id);
+    }
 }
