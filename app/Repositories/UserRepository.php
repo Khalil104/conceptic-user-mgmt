@@ -6,26 +6,27 @@ use App\Models\User;
 
 class UserRepository {
     
-    // crée un nouvel enregistrement dans la table associé aux modèles
+    // crée un nouvel enregistrement dans la table users
     public function create(array $data) {
         return User::create($data);
     }
 
-    //Récupère à travers un tableau tous les users en utilisant $query 
-    // pour terminer spécifier les contraintes
+    // On initialise une requête sur le modèle User
     public function getAll(array $filters = []) {
         $query = User::query();
         
-        // filtre exact sur le nom peu importe la casee
+        // if un filtre name est fourni, on ajoute une condition 
+        // sur la colonne name.
         if(isset($filters['name'])) {
             $query->where('name', 'ilike', '%' . $filters['name'] . '%'); 
         }
 
-        // Filtres exacts (status et role)
+        // Filtre exact (status)
         if (!empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
 
+        // Filtres exact (role)
         if (!empty($filters['role'])) {
             $query->where('role', $filters['role']);
         }

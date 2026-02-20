@@ -7,8 +7,10 @@ use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse; 
-use Illuminate\Http\Response;
+use Illuminate\Http\Response;   
+use \Illuminate\Http\Request;
 
+// Gère les requêtes et leur affichage ; lie les routes aux services
 class UserController extends Controller {
 
     protected $userService;
@@ -18,10 +20,10 @@ class UserController extends Controller {
         $this->userService = $userService;
     } // fin du constructeur
 
-    // Fonction pour créer un utilisateur. Il envoit la réponse sous le format JSON
-    // On utilise les blocks try ... catch pour capturer les éventuels erreurs et les afficher 
-    //de façon bien structurer.
-
+    // Création d'un utilisateur ; Envoit de la réponse sous le format JSON
+    // On utilise les blocks try ... catch pour capturer les éventuels erreurs
+    // et les afficher de façon bien structurer.
+    
     public function store(StoreUserRequest $request): JsonResponse {
         try {
             $user = $this->userService->createUser($request->validated());
@@ -29,7 +31,7 @@ class UserController extends Controller {
                 "success" => true,
                 "message" => "Operation successful",
                 "data" => $user
-            ], Response::HTTP_CREATED);
+            ], 201); //  Response::HTTP_CREATED
         } catch (\Exception $e) {
             return response()->json([
                 "success" => false,
@@ -39,9 +41,10 @@ class UserController extends Controller {
         }
     } // fin de la fonction store
     
-    // Fonction pour afficher la liste des utilisateurs créer dans un format JSON
-    // Capturer également les éventuels erreurs et les afficher correctement
-    public function index(\Illuminate\Http\Request $request): JsonResponse {
+    // Fonction pour afficher la liste des utilisateurs créer, dans un format JSON
+    // Capturer également les éventuels erreurs et les afficher correctement.
+   
+    public function index(Request $request): JsonResponse {
         try {
             $filters = $request->only(['name', 'status', 'role']);
             $users = $this->userService->listUsers($filters);
@@ -64,30 +67,51 @@ class UserController extends Controller {
     public function show(string $id): JsonResponse {
         try {
             $user = $this->userService->getUserById($id);
-            return response()->json(["success" => true, "data" => $user], 200);
+            return response()->json([
+                "success" => true, 
+                "data" => $user
+            ], 200);
         } catch (\Exception $e) {
-            return response()->json(["success" => false, "message" => "User not found"], 404);
+            return response()->json([
+                "success" => false, 
+                "message" => "User not found",
+                "error" => $e->getMessage()
+            ], 404);
         }
-    }
+    } // fin de la fonction show()
 
     //Fonction pour modifier les informations d'un utilisateur à partir de son id
     public function update(UpdateUserRequest $request, string $id): JsonResponse {
         try {
             $user = $this->userService->updateUser($id, $request->validated());
-            return response()->json(["success" => true, "message" => "User updated", "data" => $user], 200);    
+            return response()->json([
+                "success" => true, 
+                "message" => "User updated", 
+                "data" => $user
+            ], 200);    
         } catch (\Exception $e) {
-            return response()->json(["success" => false, "message" => "update failed"], 500);
+            return response()->json([
+                "success" => false, 
+                "message" => "update failed",
+                "error" => $e->getMessage()
+            ], 500);
         }
-    }
+    } // fin de la fonction update()
 
     // Fonction pour supprimer un utilisateur à partir de son id
-
     public function delete(string $id): JsonResponse {
         try {
             $this->userService->deleteUser($id);
-            return response()->json(["success" => true, "message" => "User deleted"], 200);
+            return response()->json([
+                "success" => true, 
+                "message" => "User deleted"
+            ], 200);
         } catch (\Exception $e) {
-            return response()->json(["success" => false, "message" => "Delete failed"], 500);
+            return response()->json([
+                "success" => false, 
+                "message" => "Delete failed",
+                "error" => $e->getMessage()
+            ], 500);
         }
-    }   
+    }   // fin de la fonction delete()
 } // Fin de la classe UserController

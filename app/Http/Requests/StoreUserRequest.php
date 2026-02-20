@@ -7,7 +7,7 @@ use Illuminate\Validation\Rule;
 
 class StoreUserRequest extends FormRequest
 {
-    // Autoriser la requête pour le moment
+      // Toute les requêtes sont autorisées (pas de logique d'autorisation spécifique)
     public function authorize(): bool
     {
         return true;
