@@ -11,9 +11,6 @@ use Illuminate\Support\Str;
  */
 class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
     protected static ?string $password;
 
     /**
@@ -24,16 +21,22 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
+            // Génération de l'UUID pour le champ id
+            'id' => (string) Str::uuid(), 
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
-            'remember_token' => Str::random(10),
+            // 'email_verified_at' => now(),
+            'password' => static::$password ??= Hash::make('password123'),
+            // 'remember_token' => Str::random(10),
+            
+            // Ajout des champs obligatoires pour ton projet
+            'status' => fake()->randomElement(['active', 'inactive', 'suspended']),
+            'role' => fake()->randomElement(['admin', 'user']),
         ];
     }
 
     /**
-     * Indicate that the model's email address should be unverified.
+     * État non vérifié (optionnel)
      */
     public function unverified(): static
     {

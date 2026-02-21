@@ -8,6 +8,10 @@ use App\Http\Controllers\Api\UserController;
 
 // --- Routes Utilisateurs ---
 
+// php artisan route:clear   # Nettoie les routes
+// php artisan config:clear  # Nettoie la configuration (important pour phpunit.xml)
+// php artisan cache:clear   # Nettoie le cache de l'application
+
 // GET /api/users -> Liste (index)
 Route::get('users', [UserController::class, 'index']);
 

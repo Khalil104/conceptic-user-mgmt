@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            // id = identifiant de la colonne incrémenté
-            //  != uuid = identifiant unique au monde de l'utilisateur 
+            // id = Nom de la colonne incrémenté
+            //  id != uuid = identifiant unique au monde de l'utilisateur 
             $table->uuid('id')->primary(); 
 
             // Nom de l'utilisateur 
