@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
-{
+class User extends Authenticatable {
+    
     use HasUuids, HasFactory, Notifiable;
 
     // variables protégés
@@ -25,13 +25,12 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    protected function casts(): array
-    {
+    protected function casts(): array {
         // Au lieu de hacher le mot de passe ici, cela aurait pu se 
         // faire dans le userService ou le userController via la fonction Hash::make
         return [
             // Hashage automatique du password
             'password' => 'hashed', 
-        ];
+        ]; // end of the function casts
     }
-}
+} // end of the class User--extends

@@ -1,47 +1,38 @@
 # 🚀 Laravel User Management API
 
-Ce projet est une API REST de gestion d'utilisateurs développée avec **Laravel 11**. Elle implémente une architecture propre avec le **Pattern Repository/Service**, une validation stricte via les **Form Requests**.
+Ce projet est une API REST de gestion d'utilisateurs développée avec **Laravel 11**. Elle implémente une architecture propre avec le **Pattern Repository/Service**, une validation stricte via les **Form Requests** et une documentation OpenAPI ex Swagger complète.
 
 ## 📋 Fonctionnalités
 
 * **CRUD Complet** : Création, lecture, mise à jour et suppression d'utilisateurs.
 * **Validation avancée** : Gestion des doublons d'emails et formats de données.
 * **Architecture Pro** : Découplage de la logique (Controller -> Service -> Repository).
-* **Authentification** : Prêt pour Sanctum.
+* **Documentation Interactive** : Swagger UI intégré.
+* **Qualité Logicielle** : Tests unitaires et fonctionnels avec rapport de couverture.
 
 ---
 
 ## 🛠️ Prérequis
 
-Avant de commencer, assurez-vous d'avoir installé :
-
-* **PHP** >= 8.2
+* **PHP** >= 8.2 (avec extension **PCOV** pour la couverture de tests)
 * **Composer**
-* **PostgreSQL**
+* **PostgreSQL** ou **SQLite**(pour les tests)  
 * **Git**
 
 ---
 
-## ⚙️ Installation
+## ⚙️ Installation & Configuration
 
-### 1. Cloner le projet
+### 1. Cloner et Installer
 
 ```bash
 git clone https://github.com/Web104/laravel-app.git
 cd laravel-app
-
-```
-
-### 2. Installer les dépendances
-
-```bash
 composer install
 
 ```
 
-### 3. Configuration de l'environnement
-
-Copie le fichier d'exemple et génère la clé d'application :
+### 2. Environnement
 
 ```bash
 cp .env.example .env
@@ -49,77 +40,94 @@ php artisan key:generate
 
 ```
 
-### 4. Configuration de la base de données
-
-Ouvrez votre fichier `.env` et configurez vos accès :
-
-```env
-DB_CONNECTION=pqsql
-DB_HOST=127.0.0.1
-DB_PORT=5432
-DB_DATABASE=nom_de_votre_base
-DB_USERNAME=root
-DB_PASSWORD=votre_mot_de_passe
-
-```
-
-### 5. Migration et Données de test
-
-Lancez les migrations pour créer les tables et (optionnel) peuplez la base :
+*Note : Assurez-vous que les dossiers de stockage existent (requis pour Swagger sur Windows) :*
 
 ```bash
-php artisan migrate
-# Pour créer des utilisateurs de test (si configuré) :
-php artisan db:seed 
+mkdir storage\framework\views
 
 ```
 
----
+### 3. Base de données
 
-## 🚀 Exécution
-
-### Lancer le serveur local
+Configurez votre `.env`, puis :
 
 ```bash
-php artisan serve
+php artisan migrate --seed
+
+``` 
+
+---
+
+## 📑 Documentation de l'API
+
+L'API est documentée avec **Swagger (L5-Swagger)**. En cas de modification des annotations, suivez ces étapes :
+
+### Générer la documentation
+
+Si vous rencontrez l'erreur `Required @OA\PathItem() not found`, nettoyez le cache avant de générer :
+
+```bash
+php artisan config:clear
+php artisan l5-swagger:generate
 
 ```
 
-L'API sera accessible sur : `http://127.0.0.1:8000`
+### Accéder aux interfaces
+
+* **Swagger UI (Interactif)** : `http://127.0.0.1:8000/api/documentation`
+* **Postman** : Importez le fichier généré situé dans `storage/api-docs/api-docs.json`.
 
 ---
 
-## 📑 Utilisation de l'API (Endpoints)
+## 🧪 Tests & Qualité
 
-| Méthode | Endpoint | Description |
-| --- | --- | --- |
-| **GET** | `/api/users` | Liste tous les utilisateurs |
-| **POST** | `/api/users` | Créer un utilisateur |
-| **GET** | `/api/users/{id}` | Détails d'un utilisateur |
-| **PUT** | `/api/users/{id}` | Modifier un utilisateur |
-| **DELETE** | `/api/users/{id}` | Supprimer un utilisateur |
+Le projet inclut des tests unitaires (Models) et fonctionnels (API).
 
-> **⚠️ Note importante pour Postman :** > Pour toutes les requêtes, ajoutez le header suivant pour recevoir les erreurs au format JSON :
-> `Accept: application/json`
+### Exécuter les tests
+
+```bash
+php artisan test
+
+```
+
+### Couverture de code (Code Coverage)
+
+Pour générer le rapport de couverture (nécessite l'extension `pcov` ou `xdebug`) :
+
+```bash
+# Rapport dans le terminal
+php artisan test --coverage
+
+# Rapport HTML détaillé (recommandé pour audit)
+php artisan test --coverage-html=tests/coverage
+
+```
+
+*Le rapport sera disponible dans `tests/coverage/index.html`.*
 
 ---
 
-## 🧪 Tests
+### Accéder aux interfaces
 
-Pour vérifier que la validation fonctionne (ex: envoyer un JSON vide) :
-
-1. Ouvrez Postman.
-2. Créez une requête `POST` sur `http://127.0.0.1:8000/api/users`.
-3. Ajoute le header `Accept: application/json`.
-4. Envoyez sans corps (body) : Vous devriez recevoir une erreur **422 Unprocessable Entity**.
+* **Swagger UI (Interactif)** : Rendez-vous sur `http://127.0.0.1:8000/api/documentation` pour tester l'API directement depuis le navigateur.
+* **Postman** : Pour importer les requêtes, ouvrez Postman > Import > Sélectionnez le fichier `storage/api-docs/api-docs.json`. Cela créera automatiquement une collection prête à l'emploi.
 
 ---
 
 ## 📁 Structure du Projet
 
-* **Controllers** : `app/Http/Controllers/Api`
-* **Requests** : `app/Http/Requests` (Validation)
-* **Services** : `app/Services` (Logique métier)
-* **Repositories** : `app/Repositories` (Accès BDD)
+* **Controllers** : `app/Http/Controllers/Api` (Annotations Swagger en Attributes PHP 8.2)
+* **Services** : `app/Services` (Logique métier - **Couverture 100%**)
+* **Repositories** : `app/Repositories` (Abstraction de la base de données)
+* **Tests** : `tests/Feature` et `tests/Unit`
 
 ---
+
+## 🚀 Troubleshooting (Problèmes fréquents)
+
+* **Erreur 500 sur Swagger UI** : Lancez `php artisan view:clear` et vérifiez que le dossier `storage/framework/views` existe.
+* **Assets Swagger manquants** : Exécutez `php artisan vendor:publish --provider="L5Swagger\L5SwaggerServiceProvider"`.
+* **Tests échoués** : Vérifiez que votre fichier `phpunit.xml` utilise bien une base de données en mémoire (`sqlite` / `:memory:`).
+
+---
+

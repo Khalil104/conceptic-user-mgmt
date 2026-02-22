@@ -4,13 +4,13 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
+
     /**
      * Faire des modifications
      */
-    public function up(): void
-    {
+    public function up(): void {
+
         Schema::create('users', function (Blueprint $table) {
             // id = Nom de la colonne incrémenté
             //  id != uuid = identifiant unique au monde de l'utilisateur 
@@ -34,13 +34,12 @@ return new class extends Migration
             // timestamps ->create_at() et updated_at()
             $table->timestamps();
         });
-    }
+    } //end of the function up !
 
     /**
      * Annuler des modifications
      */
-    public function down(): void
-    {
+    public function down(): void {
         Schema::dropIfExists('users');
-    }
+    } // end of the function down
 };

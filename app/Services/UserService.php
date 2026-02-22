@@ -37,4 +37,4 @@ class UserService {
      public function deleteUser(String $id) {
         return $this->userRepository->delete($id);
     }
-}
+} // end of the  class UserService

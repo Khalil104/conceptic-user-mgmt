@@ -52,4 +52,4 @@ class UserRepository {
         $user = $this->findById($id);
         return $user->delete();
     }
-}
+} // end of the class UserRepository

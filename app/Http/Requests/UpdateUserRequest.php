@@ -10,7 +10,7 @@ class UpdateUserRequest extends FormRequest {
     // Toute les requêtes sont autorisées (pas de logique d'autorisation spécifique)
      public function authorize(): bool {
         return true; 
-    }
+    } // end of the function authorize
 
     public function rules(): array  {
         // On récupère l'ID de l'utilisateur depuis l'URL de la route : /api/users/{id}
@@ -38,5 +38,5 @@ class UpdateUserRequest extends FormRequest {
             // le rôle qu'il choisit doit figuré dans le in:
             'role'     => 'sometimes|in:admin,user',
         ];
-    }
+    } // end of the function rules
 }

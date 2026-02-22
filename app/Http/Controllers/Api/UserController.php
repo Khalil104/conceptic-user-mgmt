@@ -6,32 +6,70 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Services\UserService;
-use Illuminate\Http\JsonResponse; 
-use Illuminate\Http\Response;   
-use \Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use OpenApi\Attributes as OA;
 
-// Gère les requêtes et leur affichage ; lie les routes aux services
-class UserController extends Controller {
-
+#[OA\Info(
+    title: "User Management API",
+    version: "1.0.0",
+    description: "Documentation de l'API de gestion des utilisateurs",
+    contact: new OA\Contact(email: "rachidbissare@gmail.com")
+)]
+#[OA\Server(url: "/api", description: "Serveur Local")]
+#[OA\Schema(
+    schema: "User",
+    type: "object",
+    properties: [
+        new OA\Property(property: "id", type: "string", format: "uuid"),
+        new OA\Property(property: "name", type: "string"),
+        new OA\Property(property: "email", type: "string"),
+        new OA\Property(property: "role", type: "string"),
+        new OA\Property(property: "status", type: "string")
+    ]
+)]
+class UserController extends Controller
+{
     protected $userService;
 
-    // Constructeur qui initialise le userService
-    public function __construct(UserService $userService) {
+    public function __construct(UserService $userService)
+    {
         $this->userService = $userService;
-    } // fin du constructeur
+    }
 
-    // Création d'un utilisateur ; Envoit de la réponse sous le format JSON
-    // On utilise les blocks try ... catch pour capturer les éventuels erreurs
-    // et les afficher de façon bien structurer.
-    
-    public function store(StoreUserRequest $request): JsonResponse {
+    #[OA\Post(
+        path: "/users",
+        summary: "Créer un utilisateur",
+        tags: ["Users"],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(ref: "#/components/schemas/User")
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: "Utilisateur créé avec succès",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Operation successful"),
+                        new OA\Property(property: "data", ref: "#/components/schemas/User")
+                    ]
+                )
+            ),
+            new OA\Response(response: 422, description: "Erreur de validation"),
+            new OA\Response(response: 500, description: "Erreur interne")
+        ]
+    )]
+    public function store(StoreUserRequest $request): JsonResponse
+    {
         try {
             $user = $this->userService->createUser($request->validated());
             return response()->json([
                 "success" => true,
                 "message" => "Operation successful",
                 "data" => $user
-            ], 201); //  Response::HTTP_CREATED
+            ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 "success" => false,
@@ -39,16 +77,35 @@ class UserController extends Controller {
                 "error" => $e->getMessage()
             ], 500);
         }
-    } // fin de la fonction store
-    
-    // Fonction pour afficher la liste des utilisateurs créer, dans un format JSON
-    // Capturer également les éventuels erreurs et les afficher correctement.
-   
-    public function index(Request $request): JsonResponse {
+    }
+
+    #[OA\Get(
+        path: "/users",
+        summary: "Liste des utilisateurs",
+        tags: ["Users"],
+        parameters: [
+            new OA\Parameter(name: "name", in: "query", schema: new OA\Schema(type: "string")),
+            new OA\Parameter(name: "role", in: "query", schema: new OA\Schema(type: "string")),
+            new OA\Parameter(name: "status", in: "query", schema: new OA\Schema(type: "string"))
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Liste récupérée",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "data", type: "array", items: new OA\Items(ref: "#/components/schemas/User"))
+                    ]
+                )
+            )
+        ]
+    )]
+    public function index(Request $request): JsonResponse
+    {
         try {
             $filters = $request->only(['name', 'status', 'role']);
             $users = $this->userService->listUsers($filters);
-
             return response()->json([
                 "success" => true,
                 "message" => "Operation successful",
@@ -61,57 +118,101 @@ class UserController extends Controller {
                 "error" => $e->getMessage()
             ], 500);
         }
-    } // fin de la fonction index()
+    }
 
-    // Fonction pour afficher les informations de l'utilisateur avec pour id::id
-    public function show(string $id): JsonResponse {
+    #[OA\Get(
+        path: "/users/{id}",
+        summary: "Détail d'un utilisateur",
+        tags: ["Users"],
+        parameters: [
+            new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "string"))
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Succès",
+                content: new OA\JsonContent(properties: [new OA\Property(property: "data", ref: "#/components/schemas/User")])
+            ),
+            new OA\Response(response: 404, description: "Non trouvé")
+        ]
+    )]
+    public function show(string $id): JsonResponse
+    {
         try {
             $user = $this->userService->getUserById($id);
             return response()->json([
-                "success" => true, 
+                "success" => true,
                 "data" => $user
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                "success" => false, 
+                "success" => false,
                 "message" => "User not found",
                 "error" => $e->getMessage()
             ], 404);
         }
-    } // fin de la fonction show()
+    }
 
-    //Fonction pour modifier les informations d'un utilisateur à partir de son id
-    public function update(UpdateUserRequest $request, string $id): JsonResponse {
+    #[OA\Put(
+        path: "/users/{id}",
+        summary: "Modifier un utilisateur",
+        tags: ["Users"],
+        parameters: [
+            new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "string"))
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(ref: "#/components/schemas/User")
+        ),
+        responses: [
+            new OA\Response(response: 200, description: "Mis à jour"),
+            new OA\Response(response: 500, description: "Erreur")
+        ]
+    )]
+    public function update(UpdateUserRequest $request, string $id): JsonResponse
+    {
         try {
             $user = $this->userService->updateUser($id, $request->validated());
             return response()->json([
-                "success" => true, 
-                "message" => "User updated", 
+                "success" => true,
+                "message" => "User updated",
                 "data" => $user
-            ], 200);    
+            ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                "success" => false, 
+                "success" => false,
                 "message" => "update failed",
                 "error" => $e->getMessage()
             ], 500);
         }
-    } // fin de la fonction update()
+    }
 
-    // Fonction pour supprimer un utilisateur à partir de son id
-    public function delete(string $id): JsonResponse {
+    #[OA\Delete(
+        path: "/users/{id}",
+        summary: "Supprimer un utilisateur",
+        tags: ["Users"],
+        parameters: [
+            new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "string"))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "Supprimé"),
+            new OA\Response(response: 500, description: "Erreur")
+        ]
+    )]
+    public function delete(string $id): JsonResponse
+    {
         try {
             $this->userService->deleteUser($id);
             return response()->json([
-                "success" => true, 
+                "success" => true,
                 "message" => "User deleted"
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                "success" => false, 
+                "success" => false,
                 "message" => "Delete failed",
                 "error" => $e->getMessage()
             ], 500);
         }
-    }   // fin de la fonction delete()
-} // Fin de la classe UserController
+    }
+}

@@ -6,12 +6,11 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class UserApiTest extends TestCase 
-{
+class UserApiTest extends TestCase  {
+
     use RefreshDatabase;
 
-    public function test_can_create_user() 
-    {
+    public function test_can_create_user()  {
         $userData = [
             'name' => 'Rachid Test',
             'email' => 'rachid@example.com',
@@ -27,10 +26,9 @@ class UserApiTest extends TestCase
                  ->assertJsonStructure(['data' => ['id', 'name', 'email']]);
         
         $this->assertDatabaseHas('users', ['email' => 'rachid@example.com']);
-    }
+    } // end of function test_can_create_user()
 
-    public function test_can_list_and_filter_users() 
-    {
+    public function test_can_list_and_filter_users() {
         $uniqueName = 'User_Unique_Test_99';
         User::factory()->create(['name' => $uniqueName, 'role' => 'admin', 'status'=> 'active']);
         User::factory()->create(['name' => 'Other User', 'role' => 'user']);
@@ -48,20 +46,18 @@ class UserApiTest extends TestCase
         foreach ($response->json('data') as $user) {
             $this->assertEquals('admin', $user['role']);
         }
-    }
+    } // end of the  function test_can_list_and_filter_users()
 
-    public function test_can_show_user_detail() 
-    {
+    public function test_can_show_user_detail() {
         $user = User::factory()->create();
 
         $response = $this->getJson("/api/users/{$user->id}");
         
         $response->assertStatus(200)
                  ->assertJsonPath('data.id', $user->id);
-    }
+    } // end of the test_can_show_user_detail() 
 
-    public function test_can_update_user() 
-    {
+    public function test_can_update_user() {
         $user = User::factory()->create(['name' => 'Ancien Nom']);
 
         $response = $this->putJson("/api/users/{$user->id}", [
@@ -75,23 +71,21 @@ class UserApiTest extends TestCase
             'name' => 'Nom Modifie',
             'status' => 'suspended'
         ]);
-    }
+    } // end of the function test_can_update_user()
 
-    public function test_can_delete_user() 
-    {
+    public function test_can_delete_user() {
         $user = User::factory()->create();
 
         $response = $this->deleteJson("/api/users/{$user->id}");
 
         $response->assertStatus(200);
         $this->assertDatabaseMissing('users', ['id' => $user->id]);
-    }
+    } // end of the functiontest_can_update_user()
 
-    public function test_validation_blocks_empty_request() 
-    {
+    public function test_validation_blocks_empty_request() {
         $response = $this->postJson('/api/users', []);
 
         $response->assertStatus(422)
                  ->assertJsonValidationErrors(['name', 'email', 'password']);
-    }
+    } // end of the function test_validation_blocks_empty_request()
 }

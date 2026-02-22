@@ -9,7 +9,7 @@ class StoreUserRequest extends FormRequest {
       // Toute les requêtes sont autorisées (pas de logique d'autorisation spécifique)
     public function authorize(): bool {
         return true;
-    } 
+    } // end of the function authorize
 
    // Récupérer la règle de validation à appliquer à la requête
     public function rules(): array {
@@ -25,5 +25,5 @@ class StoreUserRequest extends FormRequest {
             // Les utilisateurs sont de de deux types : Admin ou user
             'role' => ['required', Rule::in(['admin', 'user'])],
         ];
-    }
+    } // end of the function rules
 }
