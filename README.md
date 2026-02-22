@@ -98,7 +98,7 @@ Pour générer le rapport de couverture (nécessite l'extension `pcov` ou `xdebu
 # Rapport dans le terminal
 php artisan test --coverage
 
-# Rapport HTML détaillé (recommandé pour audit)
+# Rapport HTML détaillé (recommandé pour audit).
 php artisan test --coverage-html=tests/coverage
 
 ```
