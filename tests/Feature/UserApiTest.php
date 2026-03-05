@@ -10,6 +10,7 @@ class UserApiTest extends TestCase  {
 
     use RefreshDatabase;
 
+    // 
     public function test_can_create_user()  {
         $userData = [
             'name' => 'Rachid Test',
@@ -28,6 +29,7 @@ class UserApiTest extends TestCase  {
         $this->assertDatabaseHas('users', ['email' => 'rachid@example.com']);
     } // end of function test_can_create_user()
 
+    //
     public function test_can_list_and_filter_users() {
         $uniqueName = 'User_Unique_Test_99';
         User::factory()->create(['name' => $uniqueName, 'role' => 'admin', 'status'=> 'active']);
@@ -80,7 +82,7 @@ class UserApiTest extends TestCase  {
 
         $response->assertStatus(200);
         $this->assertDatabaseMissing('users', ['id' => $user->id]);
-    } // end of the functiontest_can_update_user()
+    } // end of the function test_can_update_user()
 
     public function test_validation_blocks_empty_request() {
         $response = $this->postJson('/api/users', []);

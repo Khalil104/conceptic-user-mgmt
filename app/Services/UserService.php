@@ -16,6 +16,8 @@ class UserService {
 
     // Logique de création d'un utilisateur
     public function createUser(array $data) {
+        // Le hashage est obligatoire selon les spécifications                                  
+       // $data['password'] = Hash::make($data['password']);
         return $this->userRepository->create($data);
     }
     // logique d'affichage des utilisateurs

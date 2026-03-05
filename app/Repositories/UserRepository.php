@@ -19,6 +19,7 @@ class UserRepository {
         // sur la colonne name.
         if(isset($filters['name'])) {
             $query->where('name', 'ilike', '%' . $filters['name'] . '%'); 
+            // $query->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($filters['name']) . '%']);
         }
 
         // Filtre exact (status)
