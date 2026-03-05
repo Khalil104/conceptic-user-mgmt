@@ -3,31 +3,26 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\AuthController;
 
-// API Routes
+// --- Routes publiques ---
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 
-// --- Routes Utilisateurs ---
+// --- Routes protégées (Middleware Group) ---
+Route::middleware('auth:sanctum')->group(function () {
 
-// php artisan route:clear   # Nettoie les routes
-// php artisan config:clear  # Nettoie la configuration (important pour phpunit.xml)
-// php artisan cache:clear   # Nettoie le cache de l'application
+    // Récupérer les infos de l'utilisateur connecté
+    Route::get('/me', function (Request $request) {
+        return $request->user();
+    });
 
-// GET /api/users -> Liste (index)
-Route::get('users', [UserController::class, 'index']);
+    // Gestion des utilisateurs (CRUD)
+    Route::get('/users', [UserController::class, 'index']);
+    Route::post('/users', [UserController::class, 'store']);
+    Route::get('/users/{user}', [UserController::class, 'show']);
+    Route::put('/users/{user}', [UserController::class, 'update']);
+    Route::delete('/users/{user}', [UserController::class, 'delete']); 
 
-// POST /api/users -> Création (store)
-Route::post('users', [UserController::class, 'store']);
-
-// GET /api/users{user} -> Détail (show)
-Route::get('users/{user}', [UserController::class, 'show']);
-
-// PUT /api/users/{user} -> Mise à jour (update)
-Route::put('users/{user}', [UserController::class, 'update']);
-
-// DELETE /api/user/{user} -> Suppression (destroy)
-Route::delete('users/{user}', [UserController::class, 'delete']);
-
-// --- Route Authentifiée ---
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+    // Déconnexion
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
