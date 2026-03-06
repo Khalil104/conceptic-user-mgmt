@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\JsonReponse;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -15,6 +16,7 @@ class AuthController extends Controller {
         $this->authService = $authService;
     }
 
+    // Format attendues lors de la connexion
     public function login (Request $request) : JsonResponse {
         $credentials = $request ->validate ([
             'email' => 'required|email',
@@ -37,6 +39,26 @@ class AuthController extends Controller {
         ]);
     }
 
+    // Vérification 2FA 
+    public function verify2FA(Request $request): JsonResponse {
+        $request ->validate([
+            'user_id' => 'required|uuid|exists:users,id',
+            'code' => 'required|string|size:6',
+        ]);
+
+        $result = $this->authService->verify2FACode($request->user_id, $request->code);
+
+        if (!$result['success']) {
+            return response()->json([
+                'success' => false,
+                'message' => $result['message']
+            ], $result['code']);
+        }
+        
+        return response()->json($result);
+    }
+
+    // Fonction pour récupérer l'utilisateur connecté.
     public function me(Request $request): JsonResponse {
         return response()->json([
             'success' => true,
@@ -44,6 +66,7 @@ class AuthController extends Controller {
         ]);
     }
 
+    // Fonction pour déconnecter l'utilisateur
     public function logout(Request $request): JsonResponse {
         $this->authService->logout($request->user());
 

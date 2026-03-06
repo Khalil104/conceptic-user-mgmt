@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\AuthController;
 // --- Routes publiques ---
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 
+Route::post('/verify-2fa',[AuthController::class, 'verify2FA']);
+
 // --- Routes protégées (Middleware Group) ---
 Route::middleware('auth:sanctum')->group(function () {
 
