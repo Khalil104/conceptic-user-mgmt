@@ -30,7 +30,7 @@ Route::middleware('auth:sanctum')->group(function () {
         return response()->json([
             'success' => true,
             'message' => 'Bienvenue sur votre Dashboard sécurisé !',
-            'user' => auth()->user()
+            // 'user' => auth()->user()
         ]);
     });
     
