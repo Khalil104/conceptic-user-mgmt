@@ -25,6 +25,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/users/{user}', [UserController::class, 'update']);
     Route::delete('/users/{user}', [UserController::class, 'delete']); 
 
+    //  Accès au dashboard
+    Route::get('/dashboard', function () {
+        return response()->json([
+            'success' => true,
+            'message' => 'Bienvenue sur votre Dashboard sécurisé !',
+            'user' => auth()->user()
+        ]);
+    });
+    
     // Déconnexion
     Route::post('/logout', [AuthController::class, 'logout']);
 });

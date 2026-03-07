@@ -15,6 +15,124 @@
         }
     ],
     "paths": {
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Étape 1 : Connexion initiale",
+                "description": "Vérifie les identifiants et envoie un code 2FA par email.",
+                "operationId": "222b2625838e3c57e017987f73598fda",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Code 2FA envoyé avec succès"
+                    },
+                    "401": {
+                        "description": "Identifiants incorrects"
+                    }
+                }
+            }
+        },
+        "/api/login/verify": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Étape 2 : Validation du code 2FA",
+                "description": "Vérifie le code à 6 chiffres et génère le token final.",
+                "operationId": "24c20195e6108c41daadff694ec8c005",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "user_id": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "example": "550e8400-e29b-41d4-a716-446655440000"
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "example": "123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Authentification réussie, token généré"
+                    },
+                    "422": {
+                        "description": "Code invalide ou expiré"
+                    }
+                }
+            }
+        },
+        "/api/me": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Récupérer l'utilisateur connecté",
+                "operationId": "8367feff40ba10e43187792cad3132c1",
+                "responses": {
+                    "200": {
+                        "description": "Données utilisateur"
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Déconnexion",
+                "operationId": "ad65cbbd4e9f201619eae184a5961a98",
+                "responses": {
+                    "200": {
+                        "description": "Déconnexion réussie"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/users": {
             "get": {
                 "tags": [
@@ -242,9 +360,20 @@
                 },
                 "type": "object"
             }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
         }
     },
     "tags": [
+        {
+            "name": "Auth",
+            "description": "Auth"
+        },
         {
             "name": "Users",
             "description": "Users"
