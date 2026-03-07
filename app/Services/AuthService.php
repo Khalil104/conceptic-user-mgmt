@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\VerificationCode;
 use App\Repositories\AuthRepository;
+use Illuminate\Support\Facades\Mail;
+ use App\Mail\TwoFactorCodeMail;
 use Illuminate\Validation\ValidationException;
 
 class AuthService {
@@ -32,13 +34,24 @@ class AuthService {
             'expires_at' => now()->addMinutes(10)
         ]);
 
+        // Envoi de l'email
+        Mail::to($user->email)->send(new TwoFactorCodeMail($code));
+
         //Simuler l'envoi (On le renvoie dans la réponse pour les tests)
         return [
             'status' => '2FA_REQUIRED',
-            'message' => 'Veuillez entrer le code envoyé par email',
-            'temp_user_id' => $user->id,
-            'dev_debug_code' => $code 
+            'message' => 'Un code de vérification a été envoyé à votre adresse mail.',
+            'user_id' => $user->id
+            // 'message' => 'Veuillez entrer le code envoyé par email',
+            // 'temp_user_id' => $user->id,
+            // 'dev_debug_code' => $code 
         ];
+
+        // Simulation de l'envoi du SMS
+        if(config('services.sms.provider') === 'log') {
+            \Illuminate\Support\Facades\Log::info("SMS envoyé à {$user->phone} : Votre code est $code ");
+        }
+
         // Suppression des anciens tokens pour n'en avoir qu'un actif
        //  $user->tokens()->delete();
 
