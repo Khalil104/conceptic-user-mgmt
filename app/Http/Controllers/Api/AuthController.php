@@ -66,7 +66,7 @@ class AuthController extends Controller
     }
 
     #[OA\Post(
-        path: "/api/login/verify",
+        path: "/api/verify-2fa",
         summary: "Étape 2 : Validation du code 2FA",
         description: "Vérifie le code à 6 chiffres et génère le token final.",
         tags: ["Auth"],
@@ -107,8 +107,8 @@ class AuthController extends Controller
     }
 
     #[OA\Get(
-        path: "/api/me",
-        summary: "Récupérer l'utilisateur connecté",
+        path: "/api/dashboard",
+        summary: "Récupérer l'utilisateur connecté/Accéder à son dashboard",
         tags: ["Auth"],
         security: [["bearerAuth" => []]],
         responses: [

@@ -53,14 +53,14 @@
                 }
             }
         },
-        "/api/login/verify": {
+        "/api/verify-2fa": {
             "post": {
                 "tags": [
                     "Auth"
                 ],
                 "summary": "Étape 2 : Validation du code 2FA",
                 "description": "Vérifie le code à 6 chiffres et génère le token final.",
-                "operationId": "24c20195e6108c41daadff694ec8c005",
+                "operationId": "ef6361a6b53b11768ccf5e908c01e9fc",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -92,13 +92,13 @@
                 }
             }
         },
-        "/api/me": {
+        "/api/dashboard": {
             "get": {
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Récupérer l'utilisateur connecté",
-                "operationId": "8367feff40ba10e43187792cad3132c1",
+                "summary": "Récupérer l'utilisateur connecté/Accéder à son dashboard",
+                "operationId": "e0404370302d58aed9bc4713ef63d32e",
                 "responses": {
                     "200": {
                         "description": "Données utilisateur"
