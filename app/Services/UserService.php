@@ -22,12 +22,12 @@ class UserService {
     }
     // logique d'affichage des utilisateurs
     public function listUsers(array $filters) {
-        return $this->userRepository->getAll($filters);
+        return $this->userRepository->All($filters);
     }
 
     // Logique d'affichage d'un utilisateur via id
     public function getUserById(string $id) {
-        return $this->userRepository->findById($id);
+        return $this->userRepository->find($id);
     }
 
     // logique de modification d'un utilisateur via son id

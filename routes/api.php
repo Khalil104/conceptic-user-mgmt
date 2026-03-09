@@ -19,9 +19,9 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Gestion des utilisateurs (CRUD)
-    Route::get('/users', [UserController::class, 'index']);
-    Route::post('/users', [UserController::class, 'store']);
-    Route::get('/users/{user}', [UserController::class, 'show']);
+    Route::get('/users', [UserController::class, 'all']);
+    Route::post('/users', [UserController::class, 'create']);
+    Route::get('/users/{user}', [UserController::class, 'find']);
     Route::put('/users/{user}', [UserController::class, 'update']);
     Route::delete('/users/{user}', [UserController::class, 'delete']); 
 

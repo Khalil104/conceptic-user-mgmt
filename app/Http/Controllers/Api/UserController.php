@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
@@ -35,6 +35,46 @@ class UserController extends Controller {
         $this->userService = $userService;
     }
 
+     #[OA\Get(
+        path: "/users",
+        summary: "Liste des utilisateurs",
+        tags: ["Users"],
+        parameters: [
+            new OA\Parameter(name: "name", in: "query", schema: new OA\Schema(type: "string")),
+            new OA\Parameter(name: "role", in: "query", schema: new OA\Schema(type: "string")),
+            new OA\Parameter(name: "status", in: "query", schema: new OA\Schema(type: "string"))
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Liste récupérée",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "data", type: "array", items: new OA\Items(ref: "#/components/schemas/User"))
+                    ]
+                )
+            )
+        ]
+    )]
+    public function all(Request $request): JsonResponse {
+        try {
+            $filters = $request->only(['name', 'status', 'role']);
+            $users = $this->userService->listUsers($filters);
+            return response()->json([
+                "success" => true,
+                "message" => "Operation successful",
+                "data" => $users
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                "success" => false,
+                "message" => "Internal server error",
+                "error" => $e->getMessage()
+            ], 500);
+        }
+    }
+
     #[OA\Post(
         path: "/users",
         summary: "Créer un utilisateur",
@@ -59,7 +99,7 @@ class UserController extends Controller {
             new OA\Response(response: 500, description: "Erreur interne")
         ]
     )]
-    public function store(StoreUserRequest $request): JsonResponse {
+    public function create(CreateUserRequest $request): JsonResponse {
         try {
             $user = $this->userService->createUser($request->validated());
             return response()->json([
@@ -67,46 +107,6 @@ class UserController extends Controller {
                 "message" => "Operation successful",
                 "data" => $user
             ], 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                "success" => false,
-                "message" => "Internal server error",
-                "error" => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    #[OA\Get(
-        path: "/users",
-        summary: "Liste des utilisateurs",
-        tags: ["Users"],
-        parameters: [
-            new OA\Parameter(name: "name", in: "query", schema: new OA\Schema(type: "string")),
-            new OA\Parameter(name: "role", in: "query", schema: new OA\Schema(type: "string")),
-            new OA\Parameter(name: "status", in: "query", schema: new OA\Schema(type: "string"))
-        ],
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: "Liste récupérée",
-                content: new OA\JsonContent(
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: true),
-                        new OA\Property(property: "data", type: "array", items: new OA\Items(ref: "#/components/schemas/User"))
-                    ]
-                )
-            )
-        ]
-    )]
-    public function index(Request $request): JsonResponse {
-        try {
-            $filters = $request->only(['name', 'status', 'role']);
-            $users = $this->userService->listUsers($filters);
-            return response()->json([
-                "success" => true,
-                "message" => "Operation successful",
-                "data" => $users
-            ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 "success" => false,
@@ -132,7 +132,7 @@ class UserController extends Controller {
             new OA\Response(response: 404, description: "Non trouvé")
         ]
     )]
-    public function show(string $id): JsonResponse {
+    public function find(string $id): JsonResponse {
         try {
             $user = $this->userService->getUserById($id);
             return response()->json([

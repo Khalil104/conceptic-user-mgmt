@@ -12,7 +12,7 @@ class UserRepository {
     }
 
     // On initialise une requête sur le modèle User
-    public function getAll(array $filters = []) {
+    public function All(array $filters = []) {
         $query = User::query();
         
         // if un filtre name est fourni, on ajoute une condition 
@@ -37,20 +37,20 @@ class UserRepository {
     }
 
     // Trouver un utilisateur par son UUID
-    public function findById(string $id) {
+    public function find(string $id) {
         return User::findOrFail($id);
     }
 
     // Modifier un user à partir de son id
     public function update(string $id, array $data) {
-        $user = $this->findById($id);
+        $user = $this->find($id);
         $user->update($data);
         return $user;
     }
 
     // Supprimer un utilisateur à partir de son id
     public function delete(string $id) {
-        $user = $this->findById($id);
+        $user = $this->find($id);
         return $user->delete();
     }
 } // end of the class UserRepository
