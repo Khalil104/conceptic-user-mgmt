@@ -33,7 +33,7 @@ class UpdateUserRequest extends FormRequest {
             ],
             // le mot de passe doit avoir au minimum 8 caractère
             'password' => 'sometimes|string|min:8',
-            // le nouveau statut qu'il entre soit figuré dans le in:
+            // le nouveau statut qu'il entre doit figuré dans le in:
             'status'   => 'sometimes|in:active,inactive,suspended,deleted',
             // le rôle qu'il choisit doit figuré dans le in:
             'role'     => 'sometimes|in:admin,user',

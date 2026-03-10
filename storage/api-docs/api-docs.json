@@ -139,7 +139,7 @@
                     "Users"
                 ],
                 "summary": "Liste des utilisateurs",
-                "operationId": "7208c29037df2b8bb02499ba39ed8a78",
+                "operationId": "9be711832c4a648cd4abd88f4f28b9d6",
                 "parameters": [
                     {
                         "name": "name",
@@ -193,7 +193,7 @@
                     "Users"
                 ],
                 "summary": "Créer un utilisateur",
-                "operationId": "262eb5ca1fdea354023c0a8870442c1e",
+                "operationId": "d52e9877a4482babcd3d6cd0ebd053fd",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -243,7 +243,7 @@
                     "Users"
                 ],
                 "summary": "Détail d'un utilisateur",
-                "operationId": "6946bbab7898f59a09e3c8e529a38907",
+                "operationId": "80ccf1e833bee5dce765b5256f71a497",
                 "parameters": [
                     {
                         "name": "id",

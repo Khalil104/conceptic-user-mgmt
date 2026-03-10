@@ -13,8 +13,8 @@ class TwoFactorCodeMail extends Mailable
     use Queueable, SerializesModels;
 
     // 1. Le constructeur reçoit le code
-    public function __construct(public string $code)
-    {
+    public function __construct(public string $code) {
+        //
     }
 
     // 2. L'enveloppe (Sujet du mail)
@@ -25,11 +25,11 @@ class TwoFactorCodeMail extends Mailable
         );
     }
 
-    // 3. LE CONTENU (Vérifie qu'il n'y en a qu'un seul !)
+    // 3. LE CONTENU
     public function content(): Content
     {
         return new Content(
-            view: 'emails.2fa-code', // Assure-toi que ce fichier existe dans resources/views/emails/
+            view: 'emails.2fa-code', // Le fichier en question existe dans resources/views/emails/
         );
     }
 

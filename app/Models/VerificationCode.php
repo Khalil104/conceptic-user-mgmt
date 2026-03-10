@@ -20,7 +20,7 @@ class VerificationCode extends Model
         return now()->gt($this->expires_at);
     }
 
-    // Si tu veux que Laravel gère automatiquement les dates
+    // Si on veux que Laravel gère automatiquement les dates
     protected $casts = [
         'expires_at' => 'datetime',
     ];

@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->uuid('id')->primary(); 
 
             // Nom de l'utilisateur 
-            $table->string('name'); 
+            $table->string('name')->comment("Nom de l'utilisateur"); 
 
             // Email de l'utilisateur : unique
             $table->string('email')->unique();
