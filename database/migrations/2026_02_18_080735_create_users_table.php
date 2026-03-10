@@ -12,26 +12,12 @@ return new class extends Migration {
     public function up(): void {
 
         Schema::create('users', function (Blueprint $table) {
-            // id = Nom de la colonne incrémenté
-            //  id != uuid = identifiant unique au monde de l'utilisateur 
-            $table->uuid('id')->primary(); 
-
-            // Nom de l'utilisateur 
-            $table->string('name')->comment("Nom de l'utilisateur"); 
-
-            // Email de l'utilisateur : unique
-            $table->string('email')->unique();
-
-            // Mot de password de l'utilisateur à haché
-            $table->string('password');
-
-            // statut possible de l'utilisateur : Par défaut actif 
-            $table->enum('status', ['inactive', 'active', 'suspended', 'deleted'])->default('active');
-            
-            // rôle possible : par défaut utilisateur
-            $table->enum ('role', ['admin', 'user'])->default('user');
-
-            // timestamps ->create_at() et updated_at()
+            $table->uuid('id')->primary()->comment('Identifiant unique universel UUID');  
+            $table->string('name')->comment("Nom et prénom de l'utilisateur"); 
+            $table->string('email')->unique()->comment('Adresse de messagerie unique');
+            $table->string('password')->comment('Empreinte hachée du mot de passe');
+            $table->enum('status', ['inactive', 'active', 'suspended', 'deleted'])->default('active')->comment(' Statut possible de l\'utilisateur : Par défaut actif');
+            $table->enum ('role', ['admin', 'user'])->default('user')->comment(' Rôle possible : par défaut user');
             $table->timestamps();
         });
     } //end of the function up !

@@ -7,24 +7,29 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Exécuter les migrations.
      */
     public function up(): void
     {
         Schema::create('personal_access_tokens', function (Blueprint $table) {
-            $table->id();
-            $table->uuidMorphs('tokenable');
-            $table->text('name');
-            $table->string('token', 64)->unique();
-            $table->text('abilities')->nullable();
-            $table->timestamp('last_used_at')->nullable();
-            $table->timestamp('expires_at')->nullable()->index();
-            $table->timestamps();
+            $table->id()->comment('Identifiant unique du token');
+            
+            // uuidMorphs crée deux colonnes : tokenable_id (UUID) et tokenable_type (string)
+            $table->uuidMorphs('tokenable'); 
+            // tokenable_id : Identifiant UUID de l’entité liée (ex. utilisateur)
+            // tokenable_type : Type de l’entité liée (ex. App\\Models\\User)
+
+            $table->text('name')->comment('Nom descriptif du token, utile pour l’identifier');
+            $table->string('token', 64)->unique()->comment('Valeur hachée du jeton d’accès, unique');
+            $table->text('abilities')->nullable()->comment('Permissions accordées au token, sous forme de liste');
+            $table->timestamp('last_used_at')->nullable()->comment('Date et heure de la dernière utilisation du token');
+            $table->timestamp('expires_at')->nullable()->index()->comment('Date et heure d’expiration du token, indexée pour les recherches rapides');
+            $table->timestamps(); // created_at et updated_at
         });
     }
 
     /**
-     * Reverse the migrations.
+     * Annuler les migrations.
      */
     public function down(): void
     {

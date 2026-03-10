@@ -5967,3 +5967,47 @@ HINT:  Peut-être que vous souhaitiez référencer la colonne « users.id ». at
 #51 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('...')
 #52 {main}
 "} 
+[2026-03-10 15:44:48] local.ERROR: The use statement with non-compound name 'Throwable' has no effect {"exception":"[object] (ErrorException(code: 0): The use statement with non-compound name 'Throwable' has no effect at E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/bootstrap/app.php:8)
+[stacktrace]
+#0 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate/Foundation/Bootstrap/HandleExceptions->handleError()
+#1 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Foundation/Console/ConfigCacheCommand.php(86): Illuminate/Foundation/Bootstrap/HandleExceptions->Illuminate/Foundation/Bootstrap/{closure}()
+#2 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Foundation/Console/ConfigCacheCommand.php(86): require('...')
+#3 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Foundation/Console/ConfigCacheCommand.php(60): Illuminate/Foundation/Console/ConfigCacheCommand->getFreshConfiguration()
+#4 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Illuminate/Foundation/Console/ConfigCacheCommand->handle()
+#5 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Container/Util.php(43): Illuminate/Container/BoundMethod::Illuminate/Container/{closure}()
+#6 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(95): Illuminate/Container/Util::unwrapIfClosure()
+#7 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate/Container/BoundMethod::callBoundMethod()
+#8 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Container/Container.php(696): Illuminate/Container/BoundMethod::call()
+#9 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Console/Command.php(213): Illuminate/Container/Container->call()
+#10 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/symfony/console/Command/Command.php(341): Illuminate/Console/Command->execute()
+#11 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Console/Command.php(182): Symfony/Component/Console/Command/Command->run()
+#12 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/symfony/console/Application.php(1102): Illuminate/Console/Command->run()
+#13 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/symfony/console/Application.php(356): Symfony/Component/Console/Application->doRunCommand()
+#14 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/symfony/console/Application.php(195): Symfony/Component/Console/Application->doRun()
+#15 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(198): Symfony/Component/Console/Application->run()
+#16 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate/Foundation/Console/Kernel->handle()
+#17 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/artisan(13): Illuminate/Foundation/Application->handleCommand()
+#18 {main}
+"} 
+[2026-03-10 15:45:21] local.ERROR: The use statement with non-compound name 'Throwable' has no effect {"exception":"[object] (ErrorException(code: 0): The use statement with non-compound name 'Throwable' has no effect at E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/bootstrap/app.php:8)
+[stacktrace]
+#0 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate/Foundation/Bootstrap/HandleExceptions->handleError()
+#1 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Foundation/Console/ConfigCacheCommand.php(86): Illuminate/Foundation/Bootstrap/HandleExceptions->Illuminate/Foundation/Bootstrap/{closure}()
+#2 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Foundation/Console/ConfigCacheCommand.php(86): require('...')
+#3 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Foundation/Console/ConfigCacheCommand.php(60): Illuminate/Foundation/Console/ConfigCacheCommand->getFreshConfiguration()
+#4 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Illuminate/Foundation/Console/ConfigCacheCommand->handle()
+#5 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Container/Util.php(43): Illuminate/Container/BoundMethod::Illuminate/Container/{closure}()
+#6 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(95): Illuminate/Container/Util::unwrapIfClosure()
+#7 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate/Container/BoundMethod::callBoundMethod()
+#8 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Container/Container.php(696): Illuminate/Container/BoundMethod::call()
+#9 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Console/Command.php(213): Illuminate/Container/Container->call()
+#10 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/symfony/console/Command/Command.php(341): Illuminate/Console/Command->execute()
+#11 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Console/Command.php(182): Symfony/Component/Console/Command/Command->run()
+#12 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/symfony/console/Application.php(1102): Illuminate/Console/Command->run()
+#13 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/symfony/console/Application.php(356): Symfony/Component/Console/Application->doRunCommand()
+#14 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/symfony/console/Application.php(195): Symfony/Component/Console/Application->doRun()
+#15 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(198): Symfony/Component/Console/Application->run()
+#16 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate/Foundation/Console/Kernel->handle()
+#17 E:/Master_IFRI/STAGE/Conceptic.io/laravel-app/laravel-app/artisan(13): Illuminate/Foundation/Application->handleCommand()
+#18 {main}
+"} 

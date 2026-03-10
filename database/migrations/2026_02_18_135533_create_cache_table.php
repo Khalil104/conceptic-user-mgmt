@@ -7,25 +7,25 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Exécuter les migrations.
      */
     public function up(): void
     {
         Schema::create('cache', function (Blueprint $table) {
-            $table->string('key')->primary();
-            $table->mediumText('value');
-            $table->integer('expiration');
+            $table->string('key')->primary()->comment('Clé unique identifiant l’entrée de cache');
+            $table->mediumText('value')->comment('Valeur sérialisée stockée dans le cache');
+            $table->integer('expiration')->comment('Horodatage indiquant la date d’expiration de l’entrée');
         });
 
         Schema::create('cache_locks', function (Blueprint $table) {
-            $table->string('key')->primary();
-            $table->string('owner');
-            $table->integer('expiration');
+            $table->string('key')->primary()->comment('Clé unique identifiant le verrou de cache');
+            $table->string('owner')->comment('Identifiant du propriétaire du verrou');
+            $table->integer('expiration')->comment('Horodatage indiquant la date d’expiration du verrou');
         });
     }
 
     /**
-     * Reverse the migrations.
+     * Annuler les migrations.
      */
     public function down(): void
     {

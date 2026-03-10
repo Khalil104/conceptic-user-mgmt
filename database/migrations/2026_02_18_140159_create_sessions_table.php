@@ -7,22 +7,22 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Exécuter les migrations.
      */
     public function up(): void
     {
         Schema::create('sessions', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
-            $table->string('ip_address', 45)->nullable();
-            $table->text('user_agent')->nullable();
-            $table->longText('payload');
-            $table->integer('last_activity')->index();
+            $table->string('id')->primary()->comment('Identifiant unique de la session');
+            $table->foreignId('user_id')->nullable()->index()->comment('Référence vers l’utilisateur connecté, nullable si invité');
+            $table->string('ip_address', 45)->nullable()->comment('Adresse IP de l’utilisateur, IPv4 ou IPv6');
+            $table->text('user_agent')->nullable()->comment('Chaîne User-Agent du navigateur ou client utilisé');
+            $table->longText('payload')->comment('Données sérialisées de la session');
+            $table->integer('last_activity')->index()->comment('Horodatage de la dernière activité de la session, indexé pour recherche rapide');
         });
     }
 
     /**
-     * Reverse the migrations.
+     * Annuler les migrations.
      */
     public function down(): void
     {

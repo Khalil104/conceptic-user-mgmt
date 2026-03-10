@@ -11,17 +11,16 @@ class DatabaseSeeder extends Seeder {
     /**
      * Seed the application's database.
      */
-    public function run(): void {
-        
-    // User::factory(10)->create();
-
-    // Dans les tests ou via php artisan tinker : 
-    // User::factory()->create();
-    // User::factory()->count(10)->create();
-
+   public function run(): void {
+        // 1. Compte de test principal (Identifiants fixes)
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Abdoul Rachid',
+            'email' => 'abdoulrachid@gmail.com', // Celui UTILISER dans Postman
+            'password' => bcrypt('password'), //Définition d'un mot de passe connu
         ]);
-    } // end of the function run
+
+        // 2. Créer 10 utilisateurs aléatoires pour "remplir" le dashboard
+        User::factory(10)->create();
+    }// end of the function run
+
 } // end of the class

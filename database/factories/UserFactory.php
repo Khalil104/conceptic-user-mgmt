@@ -27,7 +27,7 @@ class UserFactory extends Factory  {
             // 'remember_token' => Str::random(10),
             
             // Ajout des champs obligatoires
-            'status' => fake()->randomElement(['active', 'inactive', 'suspended']),
+            'status' => fake()->randomElement(['active', 'inactive', 'suspended', 'deleted']),
             'role' => fake()->randomElement(['admin', 'user']),
         ];
     } // end of the function definition()
