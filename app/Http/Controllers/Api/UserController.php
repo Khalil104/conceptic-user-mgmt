@@ -28,10 +28,12 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: "status", type: "string")
     ]
 )]
-class UserController extends Controller {
+class UserController extends Controller 
+{
     protected $userService;
 
-    public function __construct(UserService $userService) {
+    public function __construct(UserService $userService) 
+    {
         $this->userService = $userService;
     }
 
@@ -57,7 +59,8 @@ class UserController extends Controller {
             )
         ]
     )]
-    public function all(Request $request): JsonResponse {
+    public function all(Request $request): JsonResponse 
+    {
         try {
             $filters = $request->only(['name', 'status', 'role']);
             $users = $this->userService->listUsers($filters);
@@ -99,7 +102,8 @@ class UserController extends Controller {
             new OA\Response(response: 500, description: "Erreur interne")
         ]
     )]
-    public function create(CreateUserRequest $request): JsonResponse {
+    public function create(CreateUserRequest $request): JsonResponse 
+    {
         try {
             $user = $this->userService->createUser($request->validated());
             return response()->json([
@@ -132,7 +136,8 @@ class UserController extends Controller {
             new OA\Response(response: 404, description: "Non trouvé")
         ]
     )]
-    public function find(string $id): JsonResponse {
+    public function find(string $id): JsonResponse 
+    {
         try {
             $user = $this->userService->getUserById($id);
             return response()->json([
@@ -164,7 +169,8 @@ class UserController extends Controller {
             new OA\Response(response: 500, description: "Erreur")
         ]
     )]
-    public function update(UpdateUserRequest $request, string $id): JsonResponse {
+    public function update(UpdateUserRequest $request, string $id): JsonResponse 
+    {
         try {
             $user = $this->userService->updateUser($id, $request->validated());
             return response()->json([
@@ -193,7 +199,8 @@ class UserController extends Controller {
             new OA\Response(response: 500, description: "Erreur")
         ]
     )]
-    public function delete(string $id): JsonResponse {
+    public function delete(string $id): JsonResponse 
+    {
         try {
             $this->userService->deleteUser($id);
             return response()->json([

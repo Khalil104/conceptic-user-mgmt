@@ -5,14 +5,17 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class CreateUserRequest extends FormRequest {
+class CreateUserRequest extends FormRequest 
+{
       // Toute les requêtes sont autorisées (pas de logique d'autorisation spécifique)
-    public function authorize(): bool {
+    public function authorize(): bool 
+    {
         return true;
     } // end of the function authorize
 
    // Récupérer la règle de validation à appliquer à la requête
-    public function rules(): array {
+    public function rules(): array 
+    {
         return [
             // le nom est requis (obligatoire), est un string et doit comporter au minimum 3 lettres.
             'name' => ['required', 'string', 'min:3'],

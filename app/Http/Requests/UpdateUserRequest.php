@@ -5,10 +5,12 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateUserRequest extends FormRequest {
+class UpdateUserRequest extends FormRequest 
+{
     
     // Toute les requêtes sont autorisées (pas de logique d'autorisation spécifique)
-     public function authorize(): bool {
+     public function authorize(): bool 
+    {
         return true; 
     } // end of the function authorize
 

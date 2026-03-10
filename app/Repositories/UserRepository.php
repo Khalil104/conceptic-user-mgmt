@@ -7,12 +7,14 @@ use App\Models\User;
 class UserRepository {
     
     // crée un nouvel enregistrement dans la table users
-    public function create(array $data) {
+    public function create(array $data) 
+    {
         return User::create($data);
     }
 
     // On initialise une requête sur le modèle User
-    public function All(array $filters = []) {
+    public function All(array $filters = []) 
+    {
         $query = User::query();
         
         // if un filtre name est fourni, on ajoute une condition 
@@ -36,19 +38,22 @@ class UserRepository {
     }
 
     // Trouver un utilisateur par son UUID
-    public function find(string $id) {
+    public function find(string $id) 
+    {
         return User::findOrFail($id);
     }
 
     // Modifier un user à partir de son id
-    public function update(string $id, array $data) {
+    public function update(string $id, array $data) 
+    {
         $user = $this->find($id);
         $user->update($data);
         return $user;
     }
 
     // Supprimer un utilisateur à partir de son id
-    public function delete(string $id) {
+    public function delete(string $id) 
+    {
         $user = $this->find($id);
         return $user->delete();
     }

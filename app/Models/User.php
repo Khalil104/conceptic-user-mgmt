@@ -8,7 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable {
+class User extends Authenticatable 
+{
     
     use HasUuids, HasFactory, Notifiable, HasApiTokens;
 
@@ -29,7 +30,8 @@ class User extends Authenticatable {
         'remember_token',
     ];
 
-    protected function casts(): array {
+    protected function casts(): array 
+    {
         // Au lieu de hacher le mot de passe ici, cela aurait pu se 
         // faire dans le userService ou le userController via la fonction Hash::make
         return [

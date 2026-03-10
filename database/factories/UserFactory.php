@@ -9,14 +9,16 @@ use Illuminate\Support\Str;
 // Usine à données fictives : permet de définir des plans de construction (blueprint)
 // pour créer automatiquement des enregistrements dans la db
 
-class UserFactory extends Factory  {
+class UserFactory extends Factory  
+{
 
     protected static ?string $password;
 
     /**
      * @return array<string, mixed>
      */
-    public function definition(): array {
+    public function definition(): array 
+    {
         return [
             // Génération de l'UUID pour le champ id
             'id' => (string) Str::uuid(), 
@@ -35,7 +37,8 @@ class UserFactory extends Factory  {
     /**
      * État non vérifié (optionnel)
      */
-    public function unverified(): static {
+    public function unverified(): static 
+    {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);

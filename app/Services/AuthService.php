@@ -8,16 +8,19 @@ use Illuminate\Support\Facades\Mail;
  use App\Mail\TwoFactorCodeMail;
 use Illuminate\Validation\ValidationException;
 
-class AuthService {
+class AuthService 
+{
     
     protected $authRepository;
 
-    public function __construct(AuthRepository $authRepository) {
+    public function __construct(AuthRepository $authRepository) 
+    {
         $this->authRepository = $authRepository;
     }
 
     // Connexion d'un utilisateur
-    public function login(array $credentials) {
+    public function login(array $credentials) 
+    {
 
         $user = $this->authRepository->findByEmail($credentials['email']);
 
@@ -48,9 +51,9 @@ class AuthService {
         ];
 
         // Simulation de l'envoi du SMS
-        if(config('services.sms.provider') === 'log') {
-            \Illuminate\Support\Facades\Log::info("SMS envoyé à {$user->phone} : Votre code est $code ");
-        }
+        // if(config('services.sms.provider') === 'log') {
+        //     \Illuminate\Support\Facades\Log::info("SMS envoyé à {$user->phone} : Votre code est $code ");
+        // }
 
         // Suppression des anciens tokens pour n'en avoir qu'un actif
        //  $user->tokens()->delete();
@@ -63,7 +66,8 @@ class AuthService {
     }
 
     //
-    public function verify2FACode(string $userId, string $code) {
+    public function verify2FACode(string $userId, string $code) 
+    {
         // 1. Chercher le dernier code valide pour cet UUID
         $verification = \App\Models\verificationCode::where('user_id',$userId)
         ->latest()
@@ -113,7 +117,8 @@ class AuthService {
     }
 
     // Déconnexion de l'utilisateur
-    public function logout($user) {
+    public function logout($user) 
+    {
         return $user->currentAccessToken()->delete();
     }
 }
