@@ -21,11 +21,35 @@ class AuthService
     // Connexion d'un utilisateur
     public function login(array $credentials) 
     {
-
+        // 1. On cherche l'utilisateur actif
         $user = $this->authRepository->findByEmail($credentials['email']);
 
+        if (!$user) {
+            // On vérifie s'il est juste supprimé pour donner un message clair
+            $trashed = $this->authRepository->findTrashedByEmail($credentials['email']);
+
+            if ($trashed) {
+                return [
+                    'success' => false,
+                    'message' => 'Ce code a été désactivé ou supprimé.',
+                    'status' => 403
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Identifiant incorrects.',
+                'status' => 401
+            ];
+        }
+
         if (!$user || !$this->authRepository->verifyPassword($user, $credentials['password'])) {
-            return null;
+            // return null;
+            return [
+                'success' => false, 
+                'message' => 'Identifiants incorrects ou compte désactivé',
+                'status' => 401
+            ];
         }
 
         // Etape 2FA : Génération du code

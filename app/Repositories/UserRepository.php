@@ -23,6 +23,9 @@ class UserRepository {
             $query->where('name', 'ilike', '%' . $filters['name'] . '%'); 
         }
 
+        if(isset($filters['email'])) {
+            $query->where('email', $filters['email']);
+        }
         // Filtre exact (status)
         if (!empty($filters['status'])) {
             $query->where('status', $filters['status']);
@@ -41,6 +44,19 @@ class UserRepository {
     public function find(string $id) 
     {
         return User::findOrFail($id);
+    }
+
+    // Trouver un utilisateur actif par son email
+    public function findByEmail(string $email)
+    {
+        // ne trouvera que les utilisateurs où deleted_at est NULL
+        return User::where('email', $email)->first();
+    }
+
+    // Trouver un utilisateur uniquement parmi les supprimés.
+    public function findTrashedByEmail(string $email)
+    {
+        return User::onlyTrashed()->where('email', $email)->first();
     }
 
     // Modifier un user à partir de son id

@@ -21,7 +21,10 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // 2. Créer 10 utilisateurs aléatoires pour "remplir" le dashboard
-        User::factory(10)->create();
+        User::factory(50)->create([
+            'password' => bcrypt('password123'),
+        ]);
+
     }// end of the function run
 
 } // end of the class

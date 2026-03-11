@@ -51,18 +51,19 @@ class AuthController extends Controller
 
         $result = $this->authService->login($credentials);
 
-        if (!$result) {
+        if (isset($result['success']) && $result['success'] === false) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthenticated'
-            ], 401);
+                'message' =>$result['message']
+            ], $result['status'] ?? 401);
         }
 
         return response()->json([
             'success' => true,
             'message' => 'Login successful, please verify your email',
-            'data' => $result
-        ]);
+            // 'data' => $result
+            'user_id' => $result['user_id']
+        ], 200);
     }
 
     #[OA\Post(

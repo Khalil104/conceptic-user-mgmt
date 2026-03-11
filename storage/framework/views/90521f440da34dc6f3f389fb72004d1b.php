@@ -175,4 +175,4 @@
         </div>
     </body>
 </html>
-<?php /**PATH E:\Master_IFRI\STAGE\Conceptic.io\laravel-app\laravel-app\resources\views/welcome.blade.php ENDPATH**/ ?>
+<?php /**PATH E:\Master_IFRI\STAGE\Conceptic.io\conceptic_user_mgmt\resources\views/welcome.blade.php ENDPATH**/ ?>
