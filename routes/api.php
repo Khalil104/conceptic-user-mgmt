@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DashboardController;
 
 // --- Routes publiques ---
 Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -26,13 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/users/{user}', [UserController::class, 'delete']); 
 
     //  Accès au dashboard
-    Route::get('/dashboard', function () {
-        return response()->json([
-            'success' => true,
-            'message' => 'Bienvenue sur votre Dashboard sécurisé !',
-            // 'user' => auth()->user()
-        ]);
-    });
+    Route::get('/dashboard', [DashboardController::class, 'index']);
     
     // Déconnexion
     Route::post('/logout', [AuthController::class, 'logout']);
