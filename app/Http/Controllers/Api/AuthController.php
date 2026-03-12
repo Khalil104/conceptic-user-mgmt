@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\User;
 use App\Http\Controllers\Controller;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
@@ -122,6 +123,26 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'data' => $request->user()
+        ]);
+    }
+
+    public function restoreAccount(Request$request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        $user = User::onlyTrashed()->where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Aucun compte supprimé trouvé.'
+            ], 404);
+        }
+
+        $user->restore();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Votre compte a été restauré avec succès. Vous pouvez maintenant vous connecter.'
         ]);
     }
 

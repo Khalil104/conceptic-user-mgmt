@@ -27,6 +27,16 @@ class DashboardService
         ];
     }
 
+    //
+    public function getTrashedUsers()
+    {
+        // Retourne la liste des utilisateurs supprimés ainsi que leur date de suppression 
+        return User::onlyTrashed()
+            ->select('id', 'name', 'email', 'deleted_at')
+            ->orderBy('deleted_at', 'desc')
+            ->get();
+    }
+
     private function calculateRetention()
     {
         $total = User::withTrashed()->count();

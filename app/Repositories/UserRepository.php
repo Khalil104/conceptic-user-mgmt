@@ -59,6 +59,19 @@ class UserRepository {
         return User::onlyTrashed()->where('email', $email)->first();
     }
 
+    // Restauration d'un utilisateur
+    public function restore($user) {
+        // remet deleted_at à null
+        return $user->restore();
+    }
+
+    // Restore by Admin
+    // public function restore(string $id)
+    // {
+    //     $user = User::onlyTrashed()->findOrFail($id);
+    //     return $user->restore();
+    // }
+
     // Modifier un user à partir de son id
     public function update(string $id, array $data) 
     {

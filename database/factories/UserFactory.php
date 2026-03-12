@@ -30,7 +30,7 @@ class UserFactory extends Factory
             
             // Ajout des champs obligatoires
             'status' => fake()->randomElement(['active', 'inactive', 'suspended', 'deleted']),
-            'role' => fake()->randomElement(['admin', 'user']),
+            'role' => 'user',
         ];
     } // end of the function definition()
 

@@ -14,16 +14,24 @@ class DatabaseSeeder extends Seeder
      */
    public function run(): void {
         // 1. Compte de test principal (Identifiants fixes)
-        User::factory()->create([
-            'name' => 'Abdoul Rachid',
-            'email' => 'abdoulrachid@gmail.com', // Celui UTILISER dans Postman
-            'password' => bcrypt('password'), //Définition d'un mot de passe connu
-        ]);
+        // User::factory()->create([
+        //     'name' => 'Abdoul Rachid',
+        //     'email' => 'abdoulrachid@gmail.com', // Celui UTILISER dans Postman
+        //     'password' => bcrypt('password'), //Définition d'un mot de passe connu
+        // ]);
 
         // 2. Créer 10 utilisateurs aléatoires pour "remplir" le dashboard
-        User::factory(50)->create([
-            'password' => bcrypt('password123'),
+        User::factory(100)->create([
+            'password' => bcrypt('passwordUser'),
         ]);
+
+        // 3. Créer le super Admin 
+        // User::factory()->create([
+        //     'name'=>'Admins Conceptic',
+        //     'email'=> 'admin@conceptic.io',
+        //     'password' => bcrypt('password123'),
+        //     'role' => 'admin',
+        // ]);
 
     }// end of the function run
 

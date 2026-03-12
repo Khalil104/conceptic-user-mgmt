@@ -28,6 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //  Accès au dashboard
     Route::get('/dashboard', [DashboardController::class, 'index']);
+    // Route::get('/dashboard/trashed-users', [DashboardController::class, 'trashedUsers']);
     
     // Déconnexion
     Route::post('/logout', [AuthController::class, 'logout']);
