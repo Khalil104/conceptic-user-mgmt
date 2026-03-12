@@ -8,8 +8,10 @@ use App\Http\Controllers\Api\DashboardController;
 
 // --- Routes publiques ---
 Route::post('/login', [AuthController::class, 'login'])->name('login');
-
 Route::post('/verify-2fa',[AuthController::class, 'verify2FA']);
+Route::post('/restore-account', [AuthController::class, 'restoreAccount']);
+
+
 
 // --- Routes protégées (Middleware Group) ---
 Route::middleware('auth:sanctum')->group(function () {

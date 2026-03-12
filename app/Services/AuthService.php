@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use App\Models\VerificationCode;
 use App\Repositories\AuthRepository;
 use Illuminate\Support\Facades\Mail;
@@ -21,38 +22,36 @@ class AuthService
     // Connexion d'un utilisateur
     public function login(array $credentials) 
     {
-        // 1. On cherche l'utilisateur actif
-        $user = $this->authRepository->findByEmail($credentials['email']);
+        // 1. On cherche l'utilisateur actif ou supprimé
+        $user = User::withTrashed()->where('email', $credentials['email'])->first();
 
         if (!$user) {
-            // On vérifie s'il est juste supprimé pour donner un message clair
-            $trashed = $this->authRepository->findTrashedByEmail($credentials['email']);
-
-            if ($trashed) {
-                return [
-                    'success' => false,
-                    'message' => 'Ce code a été désactivé ou supprimé.',
-                    'status' => 403
-                ];
-            }
-
-            return [
-                'success' => false,
-                'message' => 'Identifiant incorrects.',
-                'status' => 401
-            ];
-        }
-
-        if (!$user || !$this->authRepository->verifyPassword($user, $credentials['password'])) {
-            // return null;
             return [
                 'success' => false, 
-                'message' => 'Identifiants incorrects ou compte désactivé',
+                'message' => 'Identifiants incorrects.', 
                 'status' => 401
             ];
         }
 
-        // Etape 2FA : Génération du code
+        if (!$this->authRepository->verifyPassword($user, $credentials['password'])) {
+           return [
+                'success' => false, 
+                'message' => 'Identifiants incorrects.', 
+                'status' => 401
+            ];
+        
+        }
+
+        if ($user->trashed()) {
+            return [
+                'success' => false,
+                'message' => 'Votre compte est désactivé ou supprimé. Souhaitez-vous le restaurer ?',
+                'can_restore' =>true,
+                'status' => 403
+            ];
+        }
+
+        // Etape 2FA : Génération du code.
         $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
         VerificationCode::create([
@@ -66,6 +65,7 @@ class AuthService
 
         //Simuler l'envoi (On le renvoie dans la réponse pour les tests)
         return [
+            'success' => true,
             'status' => '2FA_REQUIRED',
             'message' => 'Un code de vérification a été envoyé à votre adresse mail.',
             'user_id' => $user->id
@@ -89,7 +89,7 @@ class AuthService
         // ];
     }
 
-    //
+    // Vérification 2FA
     public function verify2FACode(string $userId, string $code) 
     {
         // 1. Chercher le dernier code valide pour cet UUID
@@ -124,8 +124,26 @@ class AuthService
             ];
         } 
 
-        // 5. Tout est OK : On récupère l'user, on génère le token et on nettoie
-        $user = \App\Models\User::find($userId);
+        // 5. 
+        $user =\App\Models\User::withTrashed()->find($userId);
+
+        if (!$user) {
+            return [
+                'success' => false,
+                'message' => 'Utilisateur introuvable',
+                'code' => 404
+            ];
+        }
+
+        // On empêche la génération de token si le compte est toujours trash
+        if($user->trashed()) {
+            return [
+                'success' => false,
+                'message' => 'Action impossible : ce compte est désactivé.',
+                'code' => 403
+            ] ;
+        }
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         // Supprimer le code pour qu'il ne soit plus réutilisable

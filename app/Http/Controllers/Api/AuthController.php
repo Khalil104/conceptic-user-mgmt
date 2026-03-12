@@ -43,7 +43,7 @@ class AuthController extends Controller
             new OA\Response(response: 401, description: "Identifiants incorrects")
         ]
     )]
-    public function login(Request $request): JsonResponse
+   public function login(Request $request): JsonResponse
     {
         $credentials = $request->validate([
             'email' => 'required|email',
@@ -52,21 +52,28 @@ class AuthController extends Controller
 
         $result = $this->authService->login($credentials);
 
+        // 1. On traite les échecs explicites
         if (isset($result['success']) && $result['success'] === false) {
             return response()->json([
                 'success' => false,
-                'message' =>$result['message']
+                'message' => $result['message']
             ], $result['status'] ?? 401);
+        }
+
+        // 2. On vérifie qu'on a bien reçu un user_id avant de crier victoire
+        if (!isset($result['user_id'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Une erreur inattendue est survenue.'
+            ], 500);
         }
 
         return response()->json([
             'success' => true,
             'message' => 'Login successful, please verify your email',
-            // 'data' => $result
             'user_id' => $result['user_id']
         ], 200);
     }
-
     #[OA\Post(
         path: "/api/verify-2fa",
         summary: "Étape 2 : Validation du code 2FA",
