@@ -12,6 +12,11 @@ Route::post('/verify-2fa',[AuthController::class, 'verify2FA']);
 Route::post('/restore/request', [AuthController::class, 'requestRestoration']);
 Route::post('/restore/confirm', [AuthController::class, 'confirmRestoration']);
 
+Route::get('/migrate-db', function () {
+    \Illuminate\Support\Facades\Artisan::call('migrate --force');
+    return "Base de données mise à jour !";
+});
+
 // --- Routes protégées (Middleware Group) ---
 Route::middleware('auth:sanctum')->group(function () {
 
