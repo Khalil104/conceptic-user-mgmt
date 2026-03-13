@@ -4,12 +4,7 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
-// Determine if the application is in maintenance mode...
-if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
-    require $maintenance;
-}
-
-// Créer les dossiers dans /tmp car Vercel est en lecture seule
+// 1. Création forcée des dossiers dans /tmp
 $storagePaths = [
     '/tmp/storage/framework/views',
     '/tmp/storage/framework/sessions',
@@ -23,9 +18,15 @@ foreach ($storagePaths as $path) {
     }
 }
 
-// Register the Composer autoloader...
+// 2. Chargement de l'autoloader
 require __DIR__.'/../vendor/autoload.php';
 
-// Bootstrap Laravel and handle the request...
-(require_once __DIR__.'/../bootstrap/app.php')
-    ->handleRequest(Request::capture());
+// 3. Initialisation de l'application
+$app = require_once __DIR__.'/../bootstrap/app.php';
+
+// 4. CONFIGURATION CRUCIALE POUR VERCEL
+// On force Laravel à utiliser le dossier /tmp pour le cache et les vues
+$app->useStoragePath('/tmp/storage');
+
+// 5. Gestion de la requête
+$app->handleRequest(Request::capture());
