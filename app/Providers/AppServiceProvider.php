@@ -11,8 +11,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        // On vérifie si on est sur Vercel (où le storage doit être dans /tmp)
         if (env('APP_ENV') === 'production') {
-            $this->app->useStoragePath('/tmp/storage');
+            $this->app->bind('path.storage', function () {
+                return '/tmp/storage';
+            });
         }
     }
 
