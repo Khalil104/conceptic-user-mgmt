@@ -9,6 +9,12 @@ if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php'))
     require $maintenance;
 }
 
+// Création automatique des dossiers nécessaires dans /tmp
+if (!is_dir('/tmp/storage/framework/views')) {
+    mkdir('/tmp/storage/framework/views', 0755, true);
+    mkdir('/tmp/storage/framework/sessions', 0755, true);
+    mkdir('/tmp/storage/framework/cache', 0755, true);
+}
 // Register the Composer autoloader...
 require __DIR__.'/../vendor/autoload.php';
 
