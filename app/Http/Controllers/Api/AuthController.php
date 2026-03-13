@@ -7,7 +7,11 @@ use App\Http\Controllers\Controller;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Mail\RestoreAccountCode;
+use App\Models\VerificationCode;
+use Illuminate\Support\Facades\Mail;
 use OpenApi\Attributes as OA;
+
 
 #[OA\SecurityScheme(
     securityScheme: "bearerAuth",
@@ -133,23 +137,112 @@ class AuthController extends Controller
         ]);
     }
 
-    public function restoreAccount(Request$request)
+    #[OA\Post(
+        path: "/api/restore-account",
+        summary: "Demander la restauration (OTP)",
+        description: "Envoie un code de restauration si l'email correspond à un compte supprimé.",
+        tags: ["Auth"],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                properties: [new OA\Property(property: "email", type: "string", example: "admin@conceptic.io")]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: "Code envoyé"),
+            new OA\Response(response: 404, description: "Utilisateur non trouvé")
+        ]
+    )]
+    public function requestRestoration(Request $request)
     {
         $request->validate(['email' => 'required|email']);
+        
+        // Chercher l'utilisateur dans la corbeille uniquement
+        $user = User::onlyTrashed()->where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Aucun compte supprimé trouvé'
+            ], 404);
+        }
+
+        $code = rand(100000, 999999);
+
+        VerificationCode::create([
+            'user_id' => $user->id,
+            'code' => $code,
+            'expires_at' => now()->addMinutes(10)
+        ]);
+
+        // On envoie le code par mail
+        Mail::to($user->email)->send(new RestoreAccountCode($code));
+
+        return response([
+            'success' =>true,
+            'message' => 'Un code de restauration a été envoyé sur votre boîte mail.'
+        ]);
+    }
+
+    #[OA\Post(
+        path: "/api/confirm-restore",
+        summary: "Confirmer la restauration",
+        description: "Valide le code OTP et restaure le compte (deleted_at -> null).",
+        tags: ["Auth"],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: "email", type: "string"),
+                    new OA\Property(property: "code", type: "string", example: "123456")
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: "Compte restauré"),
+            new OA\Response(response: 401, description: "Code invalide")
+        ]
+    )]
+    public function confirmRestoration(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'code' => 'required|string|size:6'
+        ]);
 
         $user = User::onlyTrashed()->where('email', $request->email)->first();
 
         if (!$user) {
             return response()->json([
-                'message' => 'Aucun compte supprimé trouvé.'
+                'success' => false,
+                'message' => 'Utilisateur introuvable.'
             ], 404);
         }
 
+        // Vérification de l'existence du code dans la table DE CODES
+        $verification = VerificationCode::where('user_id', $user->id)
+            ->where('code', $request->code)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if (!$verification) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Code invalide ou expiré'
+            ], 422);
+        }
+
+        // On restaure
         $user->restore();
+
+        $user->notify(new \App\Notifications\AccountRestoreNotification());
+
+        // On supprime le code utilisé
+        $verification->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Votre compte a été restauré avec succès. Vous pouvez maintenant vous connecter.'
+            'message' => 'Compte restauré avec succès ! Vous pouvez maintenant vous connecter ou restaurer votre mot de passe.',
+            'can_login' => true
         ]);
     }
 

@@ -114,6 +114,77 @@
                 ]
             }
         },
+        "/api/restore-account": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Demander la restauration (OTP)",
+                "description": "Envoie un code de restauration si l'email correspond à un compte supprimé.",
+                "operationId": "39985cbbb990f27bd300d89c5a0bba43",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "admin@conceptic.io"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Code envoyé"
+                    },
+                    "404": {
+                        "description": "Utilisateur non trouvé"
+                    }
+                }
+            }
+        },
+        "/api/confirm-restore": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Confirmer la restauration",
+                "description": "Valide le code OTP et restaure le compte (deleted_at -> null).",
+                "operationId": "4326901d3b99ad6822d0ec026aaf2f92",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "example": "123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Compte restauré"
+                    },
+                    "401": {
+                        "description": "Code invalide"
+                    }
+                }
+            }
+        },
         "/api/logout": {
             "post": {
                 "tags": [

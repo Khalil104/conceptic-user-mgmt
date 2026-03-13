@@ -36,7 +36,7 @@ class AccountRestoreNotification extends Notification
     {
         return (new MailMessage)
                     ->subject('Votre compte Conceptic a été restauré')
-                    ->greeting('Bonjour' . $notifiable->name  . ' !')
+                    ->greeting('Bonjour ' . $notifiable->name  . ' !')
                     ->line('Nous vous confirmons que votre compte a été restauré avec succès.')
                     ->line('Toutes vos données sont à nouveau accessibles.')
                     ->action('Se connecter', url('/login'))
