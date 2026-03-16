@@ -15,7 +15,7 @@ class VerificationCode extends Model
         'expires_at'
     ];
 
-    // Vérification : es ce que le code est encor valide ?
+    // -@- Vérification : es ce que le code est encor valide ?
     public function isExpired(): bool 
     {
         return now()->gt($this->expires_at);

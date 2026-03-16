@@ -15,29 +15,6 @@ Route::post('/verify-2fa',[AuthController::class, 'verify2FA']);
 Route::post('/restore/request', [AuthController::class, 'requestRestoration']);
 Route::post('/restore/confirm', [AuthController::class, 'confirmRestoration']);
 
-Route::get('/migrate-db', function () {
-    // 1. Désactiver le rendu de vue pour cette requête
-    config(['app.debug' => true]);
-
-    try {
-        // 2. Tester la connexion brute à la DB avant tout
-        DB::connection()->getPdo();
-        
-        // 3. Lancer la migration
-        Artisan::call('migrate --force');
-        
-        // 4. Retourner du texte pur (pas de vue !)
-        return response("Succès ! \n\n" . Artisan::output())
-                ->header('Content-Type', 'text/plain');
-
-    } catch (\Exception $e) {
-        // 5. En cas d'erreur, on affiche le message brut
-        return response("Erreur de connexion ou de migration : \n\n" . $e->getMessage())
-                ->header('Content-Type', 'text/plain');
-    }
-});
-
-
 // --- Routes protégées (Middleware Group) ---
 Route::middleware('auth:sanctum')->group(function () {
 

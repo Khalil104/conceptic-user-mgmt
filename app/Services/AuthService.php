@@ -6,7 +6,7 @@ use App\Models\User;
 use App\Models\VerificationCode;
 use App\Repositories\AuthRepository;
 use Illuminate\Support\Facades\Mail;
- use App\Mail\TwoFactorCodeMail;
+use App\Mail\TwoFactorCodeMail;
 use Illuminate\Validation\ValidationException;
 
 class AuthService 
@@ -19,10 +19,11 @@ class AuthService
         $this->authRepository = $authRepository;
     }
 
-    // Connexion d'un utilisateur
+    // -@- Connexion d'un utilisateur
     public function login(array $credentials) 
     {
-        // 1. On cherche l'utilisateur actif ou supprimé
+        // -@- Etape 1 : On cherche l'utilisateur actif ou supprimé.
+
         $user = User::withTrashed()->where('email', $credentials['email'])->first();
 
         if (!$user) {
@@ -51,7 +52,7 @@ class AuthService
             ];
         }
 
-        // Etape 2FA : Génération du code.
+        // -@- Etape 2FA : Génération du code.
         $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
         VerificationCode::create([
@@ -60,10 +61,11 @@ class AuthService
             'expires_at' => now()->addMinutes(10)
         ]);
 
-        // Envoi de l'email
+        // -@- Envoi de l'email
         Mail::to($user->email)->send(new TwoFactorCodeMail($code));
 
-        //Simuler l'envoi (On le renvoie dans la réponse pour les tests)
+        // -@- Reception du code par mail via mailtrap. 
+        // -@- Simuler l'envoi (Envoi dans la réponse pour les tests)
         return [
             'success' => true,
             'status' => '2FA_REQUIRED',
@@ -89,15 +91,15 @@ class AuthService
         // ];
     }
 
-    // Vérification 2FA
+    // -@- Vérification 2FA
     public function verify2FACode(string $userId, string $code) 
     {
-        // 1. Chercher le dernier code valide pour cet UUID
+        // -@- 1. Chercher le dernier code valide pour cet UUID
         $verification = \App\Models\verificationCode::where('user_id',$userId)
         ->latest()
         ->first();
 
-        // 2. Vérifier s'il existe 
+        // -@- 2. Vérifier s'il existe 
         if(!$verification){
             return [
                 'success' => false,
@@ -106,7 +108,7 @@ class AuthService
             ];
         }
 
-        // 3. Vérifier s'il correspond
+        // -@- 3. Vérifier s'il correspond
         if ($verification->code !== $code) {
             return [
                 'success' => false,
@@ -115,7 +117,7 @@ class AuthService
             ];
         }
 
-        // 4. Vérifier l'expiration
+        // -@- 4. Vérifier l'expiration
         if($verification->expires_at < now()) {
             return [
                 'success' => false,
@@ -124,7 +126,7 @@ class AuthService
             ];
         } 
 
-        // 5. 
+        // -@- 5.   Vérifier si l'utilisateur existe.
         $user =\App\Models\User::withTrashed()->find($userId);
 
         if (!$user) {
@@ -135,7 +137,7 @@ class AuthService
             ];
         }
 
-        // On empêche la génération de token si le compte est toujours trash
+        // -@- 6. On empêche la génération de token si le compte est toujours supprimer.
         if($user->trashed()) {
             return [
                 'success' => false,
@@ -146,9 +148,10 @@ class AuthService
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        // Supprimer le code pour qu'il ne soit plus réutilisable
+        // -@- 7. Supprimer le code pour qu'il ne soit plus réutilisable
         $verification->delete();
 
+        // -@- On retourne les informations de l'utilisateur et le token.
         return [
             'success' => true,
             'data' => [
@@ -158,7 +161,7 @@ class AuthService
         ];         
     }
 
-    // Déconnexion de l'utilisateur
+    // 8. -@- Déconnexion de l'utilisateur
     public function logout($user) 
     {
         return $user->currentAccessToken()->delete();
