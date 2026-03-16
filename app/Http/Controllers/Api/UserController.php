@@ -102,13 +102,13 @@ class UserController extends Controller
             new OA\Response(response: 500, description: "Erreur interne")
         ]
     )]
-    public function create(CreateUserRequest $request): JsonResponse 
+    public function register(CreateUserRequest $request): JsonResponse 
     {
         try {
             $user = $this->userService->createUser($request->validated());
             return response()->json([
                 "success" => true,
-                "message" => "Operation successful",
+                "message" => "Inscription réussie !",
                 "data" => $user
             ], 201);
         } catch (\Exception $e) {

@@ -107,7 +107,7 @@ class AuthController extends Controller
         $result = $this->authService->verify2FACode($request->user_id, $request->code);
 
         if (!$result['success']) {
-            // On s'assure d'utiliser 'status' ou 'code' selon ce que ton service renvoie
+            // On s'assure d'utiliser 'status' ou 'code' selon ce que le service renvoit
             $errorCode = $result['code'] ?? $result['status'] ?? 422;
             
             return response()->json([
@@ -116,7 +116,11 @@ class AuthController extends Controller
             ], $errorCode);
         }
 
-        return response()->json($result);
+        return response()->json([
+            'success' => true,
+            'message' => "Compte vérifier avec succès !",
+            'data' => $result
+        ]);
     }
 
     #[OA\Get(

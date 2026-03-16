@@ -10,10 +10,11 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 
 // --- Routes publiques ---
+Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/verify-2fa',[AuthController::class, 'verify2FA']);
-Route::post('/restore/request', [AuthController::class, 'requestRestoration']);
-Route::post('/restore/confirm', [AuthController::class, 'confirmRestoration']);
+Route::post('/restore-account', [AuthController::class, 'requestRestoration']);
+Route::post('/confirm-restore', [AuthController::class, 'confirmRestoration']);
 
 // --- Routes protégées (Middleware Group) ---
 Route::middleware('auth:sanctum')->group(function () {
@@ -25,7 +26,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Gestion des utilisateurs (CRUD)
     Route::get('/users', [UserController::class, 'all']);
-    Route::post('/users', [UserController::class, 'create']);
     Route::get('/users/{user}', [UserController::class, 'find']);
     Route::put('/users/{user}', [UserController::class, 'update']);
     Route::delete('/users/{user}', [UserController::class, 'delete']); 
