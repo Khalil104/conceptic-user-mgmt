@@ -25,9 +25,12 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // 2. Ajoute CECI pour stopper l'erreur 419 sur tes routes API
         $middleware->validateCsrfTokens(except: [
-            'api/*', // On autorise toutes les routes qui commencent par /api
-            'register',
-            'login'
+           'register', 
+            'login', 
+            'verify-2fa',
+            'logout',
+            'restore-account',
+            'confirm-restore'
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
