@@ -1,20 +1,27 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 
-// On force la route à ignorer les middlewares de session/auth pour éviter la 404/500
+// Route de secours pour vérifier que le fichier est bien lu
+Route::get('/', function () {
+    return "L'API est en ligne ! Essayez /migrate-db pour configurer la base de données.";
+});
+
+// Route de migration
 Route::get('/migrate-db', function () {
     try {
+        // Force la création des tables
         Artisan::call('migrate', ['--force' => true]);
-        return "✅ Migration réussie ! \n\n" . Artisan::output();
+        $output = Artisan::output();
+        return "✅ Migration réussie ! \n\nDétails :\n" . $output;
     } catch (\Exception $e) {
         return "❌ Erreur : " . $e->getMessage();
     }
-})->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+});
 
 // use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {
 //     return view('welcome');
 // });
-
