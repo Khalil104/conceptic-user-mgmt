@@ -18,6 +18,13 @@ foreach ($storagePaths as $path) {
 // 3. Chargement de l'autoloader
 require __DIR__.'/../vendor/autoload.php';
 
+// Force le rafraîchissement des routes sur Vercel
+$app->booted(function () use ($app) {
+    $app->make('router')->getRoutes()->refreshNameLookups();
+});
+
+$app->handleRequest(Request::capture());
+
 // 4. Initialisation de l'application
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
