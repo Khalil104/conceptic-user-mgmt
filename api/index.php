@@ -27,7 +27,7 @@ $app = require_once __DIR__ . '/../bootstrap/app.php';
 // 4. On force les chemins (crucial pour vercel)
 $app->useStoragePath('/tmp/storage');
 $app->bind('path.bootstrap', function () {
-    return 'tmp/bootstrap';
+    return '/tmp/bootstrap';
 }) ;
 
 // 5. On traite la requête 
