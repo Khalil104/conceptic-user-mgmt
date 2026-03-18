@@ -17,10 +17,17 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware) {
-        // 
+->withMiddleware(function (Middleware $middleware) {
+        // 1. Tes alias existants
         $middleware->alias([
-            'is_admin' =>\App\Http\Middleware\CheckAdmin::class
+            'is_admin' => \App\Http\Middleware\CheckAdmin::class
+        ]);
+
+        // 2. Ajoute CECI pour stopper l'erreur 419 sur tes routes API
+        $middleware->validateCsrfTokens(except: [
+            'api/*', // On autorise toutes les routes qui commencent par /api
+            'register',
+            'login'
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
