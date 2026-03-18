@@ -6,27 +6,6 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
 
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
-
-Route::get('/migrate-db', function(){
-    try {
-        // 1. On vérifie la connexion brute
-        DB::connection()->getPdo();
-
-        // 2. On lance les migrations 
-        Artisan::call('migrate', ['--force' => true]);
-
-        // 3. On récupère le résultat pour afficher à l'écran
-        $output = Artisan::output();
-
-        return response("✅ Migration réussie ! \nDétails : \n . $output")->header('content-Type', 'text/plain');
-    } catch (\Exception $e) {
-        return response("❌ Erreur lors de la migration :\n\n" . $e->getMessage())->header('Content-Type', 'text/plain');
-    } 
-});
-
 // --- Routes publiques ---
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login'])->name('login');
