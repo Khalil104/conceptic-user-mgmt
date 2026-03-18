@@ -19,7 +19,7 @@ Route::get('/migrate-db', function(){
         Artisan::call('migrate', ['--force' => true]);
 
         // 3. On récupère le résultat pour afficher à l'écran
-        $outpout = Artisan::output();
+        $output = Artisan::output();
 
         return response("✅ Migration réussie ! \nDétails : \n . $output")->header('content-Type', 'text/plain');
     } catch (\Exception $e) {
