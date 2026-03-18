@@ -7,6 +7,12 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
 
 // --- Routes publiques ---
+Route::get('/debug-routes', function () {
+    return collect(Route::getRoutes())->map(function ($route) {
+        return $route->methods()[0] . " | " . $route->uri();
+    });
+});
+
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/verify-2fa',[AuthController::class, 'verify2FA']);
