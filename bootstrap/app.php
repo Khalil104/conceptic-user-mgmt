@@ -18,19 +18,20 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
 ->withMiddleware(function (Middleware $middleware) {
-        // 1. Tes alias existants
+        // 1. Alias existants
         $middleware->alias([
             'is_admin' => \App\Http\Middleware\CheckAdmin::class
         ]);
 
-        // 2. Ajoute CECI pour stopper l'erreur 419 sur tes routes API
+        // 2. Pour stopper l'erreur 419 sur les routes API
         $middleware->validateCsrfTokens(except: [
            'register', 
             'login', 
             'verify-2fa',
             'logout',
             'restore-account',
-            'confirm-restore'
+            'confirm-restore',
+            '/users/*'
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
