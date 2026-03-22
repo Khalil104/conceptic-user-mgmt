@@ -95,7 +95,7 @@ class AuthService
     public function verify2FACode(string $userId, string $code) 
     {
         // -@- 1. Chercher le dernier code valide pour cet UUID
-        $verification = \App\Models\verificationCode::where('user_id',$userId)
+        $verification = \App\Models\VerificationCode::where('user_id',$userId)
         ->latest()
         ->first();
 
