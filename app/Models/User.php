@@ -28,17 +28,15 @@ class User extends Authenticatable
     ];
 
     protected $hidden = [
-        'password', // le mot de passe est caché dans le JSON
+        'password', 
         'remember_token',
     ];
 
     protected function casts(): array 
     {
-        // Au lieu de hacher le mot de passe ici, cela aurait pu se 
-        // faire dans le userService ou le userController via la fonction Hash::make
         return [
-            // Hashage automatique du password
+        
             'password' => 'hashed', 
-        ]; // end of the function casts
+        ]; 
     }
-} // end of the class User--extends
+}

@@ -17,10 +17,6 @@ class UserRepository {
     {
         $query = User::query();
         
-       /*
-       * if un filtre name est fourni, 
-       * on ajoute une condition  sur la colonne name.
-       */
         if(isset($filters['name'])) {
             $query->where('name', 'ilike', '%' . $filters['name'] . '%'); 
         }
@@ -81,4 +77,4 @@ class UserRepository {
         $user = $this->find($id);
         return $user->delete();
     }
-} // -@- end of the class UserRepository
+}

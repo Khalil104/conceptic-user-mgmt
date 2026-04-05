@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CreateUserRequest;
+
 use App\Http\Requests\UpdateUserRequest;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
@@ -16,7 +16,9 @@ use OpenApi\Attributes as OA;
     description: "Documentation de l'API de gestion des utilisateurs",
     contact: new OA\Contact(email: "rachidbissare@gmail.com")
 )]
+
 #[OA\Server(url: "/api", description: "Serveur Local")]
+
 #[OA\Schema(
     schema: "User",
     type: "object",
@@ -35,6 +37,10 @@ class UserController extends Controller
     public function __construct(UserService $userService) 
     {
         $this->userService = $userService;
+    }
+
+    public function index() {
+        return view("index");
     }
 
      #[OA\Get(
@@ -77,49 +83,7 @@ class UserController extends Controller
             ], 500);
         }
     }
-
-    #[OA\Post(
-        path: "/users",
-        summary: "Créer un utilisateur",
-        tags: ["Users"],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(ref: "#/components/schemas/User")
-        ),
-        responses: [
-            new OA\Response(
-                response: 201,
-                description: "Utilisateur créé avec succès",
-                content: new OA\JsonContent(
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: true),
-                        new OA\Property(property: "message", type: "string", example: "Operation successful"),
-                        new OA\Property(property: "data", ref: "#/components/schemas/User")
-                    ]
-                )
-            ),
-            new OA\Response(response: 422, description: "Erreur de validation"),
-            new OA\Response(response: 500, description: "Erreur interne")
-        ]
-    )]
-    public function register(CreateUserRequest $request): JsonResponse 
-    {
-        try {
-            $user = $this->userService->createUser($request->validated());
-            return response()->json([
-                "success" => true,
-                "message" => "Inscription réussie !",
-                "data" => $user
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                "success" => false,
-                "message" => "Internal server error",
-                "error" => $e->getMessage()
-            ], 500);
-        }
-    }
-
+ 
     #[OA\Get(
         path: "/users/{id}",
         summary: "Détail d'un utilisateur",
