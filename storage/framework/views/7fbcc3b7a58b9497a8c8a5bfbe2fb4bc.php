@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    <title>@yield('title')</title>
+    <title><?php echo $__env->yieldContent('title'); ?></title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -30,38 +30,40 @@
 </head>
 <body>
     <main class="container my-5">
-        @if(session('success'))
+        <?php if(session('success')): ?>
             <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
+                <?php echo e(session('success')); ?>
 
-        @if($errors->any())
+            </div>
+        <?php endif; ?>
+
+        <?php if($errors->any()): ?>
             <div class="alert alert-danger text-center">
                 <ul>
-                    @foreach($errors->all() as $error)
-                        {{ $error }} <br>
-                    @endforeach
+                    <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php echo e($error); ?> <br>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </ul>
 
             </div>
-        @endif
+        <?php endif; ?>
 
-        {{-- @yield('accueil') --}}
+        
 
-        @yield('header')
+        <?php echo $__env->yieldContent('header'); ?>
 
-        @yield('content')
+        <?php echo $__env->yieldContent('content'); ?>
 
-        @yield('list')
+        <?php echo $__env->yieldContent('list'); ?>
 
-        @yield('back')
+        <?php echo $__env->yieldContent('back'); ?>
     </main>
 
     <footer class="bg-dark text-white text-center py-3">
-        @yield('footer')
+        <?php echo $__env->yieldContent('footer'); ?>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+<?php /**PATH /home/rhd-khalil/Abdoul-project/conceptic_user_mgmt/resources/views/base.blade.php ENDPATH**/ ?>

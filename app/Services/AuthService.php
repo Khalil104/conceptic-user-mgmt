@@ -10,22 +10,23 @@ use App\Mail\TwoFactorCodeMail;
 use App\Mail\RestoreAccountCode;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
 
-class AuthService 
+class AuthService
 {
-    
+
     protected $authRepository;
 
-    public function __construct(AuthRepository $authRepository) 
+    public function __construct(AuthRepository $authRepository)
     {
         $this->authRepository = $authRepository;
     }
 
-    public function createUser(array $data) 
+    public function createUser(array $data)
     {
         // Hash obligatoire
         $data['password'] = Hash::make($data['password']);
-        
+
         $user = $this->authRepository->create($data);
 
         return [
@@ -37,7 +38,7 @@ class AuthService
     }
 
     // -@- Connexion d'un utilisateur
-    public function login(array $credentials) 
+    public function login(array $credentials)
     {
         // -@- Etape 1 : On cherche l'utilisateur actif ou supprimé.
 
@@ -45,9 +46,9 @@ class AuthService
 
         if (!$user || !$this->authRepository->verifyPassword($user, $credentials['password'])) {
             return [
-                'success' => false, 
-                'message' => 'Identifiants incorrects.', 
-                'status' => 401                                                                                                                                                                                                                                                                                                                  
+                'success' => false,
+                'message' => 'Identifiants incorrects.',
+                'status' => 401
             ];
         }
 
@@ -72,16 +73,16 @@ class AuthService
             'status' => '2FA_REQUIRED',
             'message' => 'Un code de vérification a été envoyé à votre adresse mail.',
             'user_id' => $user->id
-            // 'dev_debug_code' => $code 
+            // 'dev_debug_code' => $code
         ];
     }
 
     // -@- Vérification 2FA
-    public function verify2fa(string $userId, string $code) 
+    public function verify2fa(string $userId, string $code)
     {
         $verification = $this->authRepository->findVerificationCode($userId);
-      
-        // -@- 2. Vérifier s'il existe 
+
+        // -@- 2. Vérifier s'il existe
         if(!$verification){
             return [
                 'success' => false,
@@ -106,7 +107,7 @@ class AuthService
                 'message' => 'Le code a expiré.',
                 'code' => 410
             ];
-        } 
+        }
 
         // -@- 5.   Vérifier si l'utilisateur existe.
         $user =\App\Models\User::withTrashed()->find($userId);
@@ -140,7 +141,7 @@ class AuthService
                 'user' => $user,
                 'token' => $token
             ]
-        ];         
+        ];
     }
 
     public function getAuthenticatedUser($request)
@@ -163,8 +164,8 @@ class AuthService
         ];
     }
 
-    // -@- 
-    public  function requestRestoration(string $email) 
+    // -@-
+    public  function requestRestoration(string $email)
     {
         $user = $this->authRepository->findUserTrashed($email);
 
@@ -177,7 +178,7 @@ class AuthService
         }
 
         $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-        
+
         $this->authRepository->createVerificationCode($user->id, $code);
 
         Mail::to($user->email)->send(new RestoreAccountCode($code));
@@ -189,7 +190,7 @@ class AuthService
         ];
     }
 
-    public function confirmRestoration(string $email, string $code) 
+    public function confirmRestoration(string $email, string $code)
     {
         $user = $this->authRepository->findUserTrashed($email);
 
@@ -225,20 +226,15 @@ class AuthService
     }
 
     // 8. -@- Déconnexion de l'utilisateur
-    public function logout($user, bool $api = true) 
+    public function logout($user, bool $api = true)
     {
-        if($api) {
+        if($api && $user) {
             return $user->currentAccessToken()->delete();
         }
 
-       /** @var \Illuminate\Contracts\Auth\StatefulGuard $guard */
-        $guard = auth();
-        $guard->logout(); 
-        
         session()->invalidate();
         session()->regenerateToken();
 
         return true;
-
     }
 }

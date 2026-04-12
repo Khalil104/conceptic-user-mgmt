@@ -1,8 +1,6 @@
-@extends('base')
+<?php $__env->startSection('title', 'Succès | Conceptic-user-mgmt'); ?>
 
-@section('title', 'Succès | Conceptic-user-mgmt')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="container mt-5">
         <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
             <h4 class="alert-heading">Bienvenue sur Conceptic.io</h4>
@@ -13,8 +11,10 @@
             <button  type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('footer')
+<?php $__env->startSection('footer'); ?>
     &copy; 2026 conceptic.io. Tout droits réservés
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('base', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /home/rhd-khalil/Abdoul-project/conceptic_user_mgmt/resources/views/auth/register_success.blade.php ENDPATH**/ ?>

@@ -4,43 +4,47 @@ namespace App\Services;
 
 use App\Repositories\UserRepository;
 
-class UserService 
+class UserService
 {
-    
+
     protected $userRepository;
 
     // Constructeur pour initialiser l'accès au repository
-    public function __construct(UserRepository $userRepository) 
+    public function __construct(UserRepository $userRepository)
     {
         $this->userRepository = $userRepository;
     }
 
     // Logique de création d'un utilisateur
-    public function createUser(array $data) 
+    public function createUser(array $data)
     {
         return $this->userRepository->create($data);
     }
     // logique d'affichage des utilisateurs
-    public function listUsers(array $filters) 
+    public function listUsers(array $filters)
     {
         return $this->userRepository->All($filters);
     }
 
     // Logique d'affichage d'un utilisateur via id
-    public function getUserById(string $id) 
+    public function getUserById(string $id)
     {
         return $this->userRepository->find($id);
     }
 
     // logique de modification d'un utilisateur via son id
-    public function updateUser(string $id, array $data) 
+    public function updateUser(string $id, array $data)
     {
         return $this->userRepository->update($id, $data);
     }
 
-    //logique de suppression d'un utilisateur
-     public function deleteUser(String $id) 
+    public function changeUserStatus(string $id, string $status)
     {
-        return $this->userRepository->delete($id);
+        return $this->userRepository->changeStatus($id, $status);
     }
-} // end of the  class UserService
+
+   public function deleteUser(string $id)
+   {
+    return $this->userRepository->delete($id);
+   }
+}

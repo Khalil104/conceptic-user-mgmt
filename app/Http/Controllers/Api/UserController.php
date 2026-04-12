@@ -30,11 +30,11 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: "status", type: "string")
     ]
 )]
-class UserController extends Controller 
+class UserController extends Controller
 {
     protected $userService;
 
-    public function __construct(UserService $userService) 
+    public function __construct(UserService $userService)
     {
         $this->userService = $userService;
     }
@@ -65,7 +65,7 @@ class UserController extends Controller
             )
         ]
     )]
-    public function all(Request $request): JsonResponse 
+    public function all(Request $request): JsonResponse
     {
         try {
             $filters = $request->only(['name', 'status', 'role']);
@@ -83,7 +83,7 @@ class UserController extends Controller
             ], 500);
         }
     }
- 
+
     #[OA\Get(
         path: "/users/{id}",
         summary: "Détail d'un utilisateur",
@@ -100,7 +100,7 @@ class UserController extends Controller
             new OA\Response(response: 404, description: "Non trouvé")
         ]
     )]
-    public function find(string $id): JsonResponse 
+    public function find(string $id): JsonResponse
     {
         try {
             $user = $this->userService->getUserById($id);
@@ -133,7 +133,7 @@ class UserController extends Controller
             new OA\Response(response: 500, description: "Erreur")
         ]
     )]
-    public function update(UpdateUserRequest $request, string $id): JsonResponse 
+    public function update(UpdateUserRequest $request, string $id): JsonResponse
     {
         try {
             $user = $this->userService->updateUser($id, $request->validated());
@@ -151,6 +151,59 @@ class UserController extends Controller
         }
     }
 
+    #[OA\Patch(
+    path: "/users/{id}/status",
+    summary: "Changer le statut d'un utilisateur",
+    tags: ["Users"],
+    parameters: [
+        new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "string"))
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(properties: [
+            new OA\Property(property: "status", type: "string", example: "active")
+        ])
+    ),
+    responses: [
+        new OA\Response(response: 200, description: "Statut modifié"),
+        new OA\Response(response: 500, description: "Erreur")
+    ]
+)]
+    public function changeStatus(Request $request, string $id)
+    {
+        try {
+            $user = $this->userService->changeUserStatus($id, $request->status);
+
+            $result = [
+                "success" => true,
+                "message" => "Statut mis à jour",
+                "data" => $user
+            ];
+
+            // Cas API (Postman, SPA, mobile)
+            if($request->expectsJson()) {
+                return response()->json($result, 200);
+            }
+
+            // Cas Vue Blade (interface admin)
+            return redirect()
+                ->route('users.index')
+                ->with('success', $result['message']);
+        } catch (\Exception $e) {
+            $error = [
+                "success" => false,
+                "message" => "Echec de la mise à jour du statut",
+                "error" => $e->getMessage()
+            ];
+
+            if($request->expectsJson()) {
+                return response()->json($error, 500);
+            }
+
+            return back()->withErrors($error['message']);
+        }
+    }
+
     #[OA\Delete(
         path: "/users/{id}",
         summary: "Supprimer un utilisateur",
@@ -163,20 +216,30 @@ class UserController extends Controller
             new OA\Response(response: 500, description: "Erreur")
         ]
     )]
-    public function delete(string $id): JsonResponse 
-    {
-        try {
-            $this->userService->deleteUser($id);
+   public function delete(Request $request, string $id)
+   {
+    try {
+        $this->userService->deleteUser($id);
+
+        if($request->expectsJson()) {
             return response()->json([
-                "success" => true,
-                "message" => "User deleted"
+                "success" =>true,
+                "message" =>"Utilisateur supprimé avec succès"
             ], 200);
-        } catch (\Exception $e) {
+        }
+
+        return back()->with('success', 'Utilisateur supprimé');
+
+    } catch( \Exception $e) {
+        if($request->expectsJson()) {
             return response()->json([
                 "success" => false,
-                "message" => "Delete failed",
-                "error" => $e->getMessage()
+                "message" =>"Echec de la suppression",
+                "error" =>$e->getMessage()
             ], 500);
         }
+
+        return back()->withErrors('Erreur lors de la suppression' .$e->getMessage());
     }
+   }
 }

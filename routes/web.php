@@ -3,10 +3,9 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
-use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
-
+use App\Http\Controllers\Api\UserController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -45,17 +44,13 @@ Route::post('/restore-account', [AuthController::class, 'requestRestoration'])->
 
 Route::post('/restore-confirm', [AuthController::class, 'confirmRestoration'])->name('confirm-restore.process');
 
-// Route pour confirm-restore
-
-
-
 // Route web.php
 
 Route::middleware('web')->group(function () {
 
     Route::get('/me', [AuthController::class, 'me'])->name('me');
 
-    Route::delete('/users/{user}', [UserController::class, 'delete'])->name('delete.process'); 
+    Route::delete('/users/{user}', [UserController::class, 'delete'])->name('delete.process');
 
     Route::put('/users/{user}', [UserController::class, 'update'])->name('update.process');
 
@@ -63,19 +58,18 @@ Route::middleware('web')->group(function () {
 
     Route::get('/settings', [AuthController::class, 'settings'])->name('settings');
 
+    Route::get('/users', [UserController::class, 'all']);
+
+    Route::get('/users/{user}', [UserController::class, 'find']);
+
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
 });
 
 // --- Routes protégées (Middleware Sanctum) ---
 
 Route::middleware('auth:sanctum')->group(function () {
 
-    // Route::get('/me', [AuthController::class, 'me'])->name('api.me');
-
-    Route::get('/users', [UserController::class, 'all']);
-
-    Route::get('/users/{user}', [UserController::class, 'find']);
-
-    Route::get('/dashboard', [DashboardController::class, 'index']);
-    
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

@@ -57,7 +57,7 @@ class AuthController extends Controller
             new OA\Response(response: 500, description: "Erreur interne")
         ]
     )]
-    public function  register(CreateUserRequest $request) 
+    public function  register(CreateUserRequest $request)
     {
         $result = $this->authService->createUser($request->validated());
 
@@ -70,9 +70,9 @@ class AuthController extends Controller
     }
 
     //
-    public function showLogin() 
+    public function showLogin()
     {
-        return view('public.login'); 
+        return view('public.login');
     }
 
     #[OA\Post(
@@ -101,7 +101,7 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        $result = $this->authService->login($credentials);  
+        $result = $this->authService->login($credentials);
 
         // 1. Echec explicite.
         if(!$result['success']) {
@@ -113,7 +113,7 @@ class AuthController extends Controller
                 return redirect()->route('account-disabled.show')->withErrors($result['message']);
             }
             return back()->withErrors($result['message']);
-        }                                                               
+        }
 
         if ($request->expectsJson()) {
             return response()->json($result, 200);
@@ -126,7 +126,7 @@ class AuthController extends Controller
         return redirect()->route('verify-2fa.show')->with('success', $result['message']);
    }
 
-    public function showVerify() 
+    public function showVerify()
     {
         return view('public.verify-2fa');
     }
@@ -163,13 +163,13 @@ class AuthController extends Controller
         // Gestion des erreurs
         if (!$result['success']) {
             $errorCode = $result['code'] ?? $result['status'] ?? 422;
-            
+
             if($request->expectsJson()) {
                 return response()->json($result, $errorCode);
             }
 
             return back()->withErrors($result['message']);
-        }    
+        }
 
         // Succès
         if($request->expectsJson()) {
@@ -180,8 +180,12 @@ class AuthController extends Controller
 
         session(['user_id' => $user->id]);
 
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard')->with('success', 'Bienvenue Admin !');
+        }
+
         return redirect()->route('me')->with('success', 'Compte vérifié avec succès !');
-    }  
+    }
 
     public function about() {
         return view('auth.about');
@@ -201,7 +205,7 @@ class AuthController extends Controller
             new OA\Response(response: 401, description: "Non authentifié")
         ]
     )]
-    public function me(Request $request) 
+    public function me(Request $request)
     {
 
         $result = $this->authService->getAuthenticatedUser($request);
@@ -216,9 +220,9 @@ class AuthController extends Controller
 
         return view('auth.me', ['user' => $result['data']]);
     }
-    
+
     //
-    public function processDisabled(Request $request) 
+    public function processDisabled(Request $request)
     {
         if ($request->choice === 'yes') {
             $result = $this->authService->requestRestoration($request->email);
@@ -235,16 +239,16 @@ class AuthController extends Controller
         }
     }
 
-    // 
-    public function showRestore() 
+    //
+    public function showRestore()
     {
         return view('auth.restore');
     }
 
     //
     public function requestRestoration(Request $request) {
-        
-        $result = $this->authService->requestRestoration($request->email); 
+
+        $result = $this->authService->requestRestoration($request->email);
 
         if($request->expectsJson()) {
             return response()->json($request, $result['status']);
@@ -254,14 +258,15 @@ class AuthController extends Controller
             return back()->withErrors($result['message']);
         }
 
+
         return redirect()->route('restore-account.show')->with('success', $result['message']);
     }
 
     //
-    public function confirmRestoration(Request $request) 
+    public function confirmRestoration(Request $request)
     {
         $result = $this->authService->confirmRestoration($request->email, $request->code);
-        
+
         if($request->expectsJson()) {
             return response()->json($result, $result['status']);
         }
@@ -287,18 +292,23 @@ class AuthController extends Controller
     )]
     public function logout(Request $request)
     {
+        $user = $request->expectsJson() ? $request->user() : User::find(session('user_id'));
+
         if($request->expectsJson()) {
-            $this->authService->logout($request->user(), true);
+            if($user) {
+                $this->authService->logout($user, true);
+            }
 
             return response()->json([
-                'success' => true,
-                'message' => 'Déconnexion réussie !'
+                'success' =>true,
+                'message' =>'Déconnexion réussie',
             ], 200);
         }
 
-        $this->authService->logout($request->user(), false);
+        $this->authService->logout($user, false);
 
-        return redirect()->route('login.show')->with('success', 'Vous avez été déconnectez avec succès.');
+        session()->forget('user_id');
 
+        return redirect()->route('login.show')->with('success', 'Vous avez été déconnecté');
     }
 }
