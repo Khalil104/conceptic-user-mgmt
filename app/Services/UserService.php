@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Repositories\UserRepository;
+use  Illuminate\Support\Facades\Mail;
+use App\Mail\ActivationMail;
 
 class UserService
 {
@@ -15,12 +17,12 @@ class UserService
         $this->userRepository = $userRepository;
     }
 
-    // Logique de création d'un utilisateur
+    //
     public function createUser(array $data)
     {
         return $this->userRepository->create($data);
     }
-    // logique d'affichage des utilisateurs
+    // logique d'affichage des utili sateurs
     public function listUsers(array $filters)
     {
         return $this->userRepository->All($filters);

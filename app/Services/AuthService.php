@@ -5,13 +5,14 @@ namespace App\Services;
 use App\Models\User;
 use App\Models\VerificationCode;
 use App\Repositories\AuthRepository;
-use Illuminate\Support\Facades\Mail;
 use App\Mail\TwoFactorCodeMail;
 use App\Mail\RestoreAccountCode;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ActivationMail;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-
+use Illuminate\Validation\ValidationException;
 class AuthService
 {
 
@@ -27,7 +28,11 @@ class AuthService
         // Hash obligatoire
         $data['password'] = Hash::make($data['password']);
 
+        $data['activate_token'] = Str::random(32);
+
         $user = $this->authRepository->create($data);
+
+        Mail::to($user->email)->send(new ActivationMail($user));
 
         return [
             'success' => true,

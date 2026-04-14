@@ -215,7 +215,7 @@ class AuthController extends Controller
         }
 
         if (!$result['success']) {
-            return redirect()->to_route('login.show')->withErrors($result['message']);
+            return redirect()->route('login.show')->withErrors($result['message']);
         }
 
         return view('auth.me', ['user' => $result['data']]);

@@ -1,15 +1,16 @@
-<?php 
+<?php
 
 namespace App\Repositories;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use App\Models\VerificationCode;
+use Illuminate\Support\Str;
 
 class AuthRepository {
 
     // -@- Créer un utilisateur
-    public function create(array $data) 
+    public function create(array $data)
     {
         return User::create($data);
     }
@@ -20,7 +21,7 @@ class AuthRepository {
     }
 
     // -@- Trouver les utilisateurs où deleted_at est NULL.
-    public function findUserByEmail(string $email) : ?User 
+    public function findUserByEmail(string $email) : ?User
     {
         return User::withTrashed()->where('email', $email)->first();
     }
@@ -30,9 +31,9 @@ class AuthRepository {
     {
         return User::onlyTrashed()->where('email', $email)->first();
     }
-    
+
     // -@- Vérifier le mot de passe !
-    public function verifyPassword( User $user, string $password): bool 
+    public function verifyPassword( User $user, string $password): bool
     {
         return Hash::check($password, $user->password);
     }
@@ -47,7 +48,7 @@ class AuthRepository {
         ]);
     }
 
-    // -@- Vérifier si le code est correct. 
+    // -@- Vérifier si le code est correct.
     public function findVerificationCode(string $userId): ?VerificationCode
     {
         return VerificationCode::where('user_id', $userId)->latest()->first();

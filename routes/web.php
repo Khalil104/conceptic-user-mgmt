@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\ActivationController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -28,6 +29,8 @@ Route::get('/verify-2fa', [AuthController::class, 'showVerify'])->name('verify-2
 Route::get('/restore-account', [AuthController::class, 'showRestore'])->name('restore-account.show');
 
 Route::get('/account-disabled', [AuthController::class, 'showChoice'])->name('account-disabled.show');
+
+Route::get('/activate/{token}', [ActivationController::class, 'activate'])->name('activate');
 
 
 // --- process ---
