@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 
+use App\Models\User;
 use App\Http\Requests\UpdateUserRequest;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
@@ -133,75 +134,41 @@ class UserController extends Controller
             new OA\Response(response: 500, description: "Erreur")
         ]
     )]
-    public function update(UpdateUserRequest $request, string $id): JsonResponse
+
+     public function updateShow($id,  $field)
     {
-        try {
-            $user = $this->userService->updateUser($id, $request->validated());
-            return response()->json([
-                "success" => true,
-                "message" => "User updated",
-                "data" => $user
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                "success" => false,
-                "message" => "update failed",
-                "error" => $e->getMessage()
-            ], 500);
-        }
+        $user = User::findOrFail($id);
+        return view('auth.update', compact('user', 'field'));
     }
 
-    #[OA\Patch(
-    path: "/users/{id}/status",
-    summary: "Changer le statut d'un utilisateur",
-    tags: ["Users"],
-    parameters: [
-        new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "string"))
-    ],
-    requestBody: new OA\RequestBody(
-        required: true,
-        content: new OA\JsonContent(properties: [
-            new OA\Property(property: "status", type: "string", example: "active")
-        ])
-    ),
-    responses: [
-        new OA\Response(response: 200, description: "Statut modifié"),
-        new OA\Response(response: 500, description: "Erreur")
-    ]
-)]
-    public function changeStatus(Request $request, string $id)
+    public function edit(Request $request, string $id, string $field)
     {
-        try {
-            $user = $this->userService->changeUserStatus($id, $request->status);
-
-            $result = [
+        $user = $this->userService->getUserById($id);
+         if ($request->expectsJson()) {
+            return response()->json([
                 "success" => true,
-                "message" => "Statut mis à jour",
+                "message" => "Edition du champ $field",
                 "data" => $user
-            ];
+            ], 200);
+         }
 
-            // Cas API (Postman, SPA, mobile)
-            if($request->expectsJson()) {
-                return response()->json($result, 200);
-            }
+         return view('auth.update', compact('user', 'field'));
+    }
+    public function update(Request $request, $id, $field)
+    {
+        $user = User::findOrFail($id);
+        $user->$field = $request->input($field);
+        $user->save();
 
-            // Cas Vue Blade (interface admin)
-            return redirect()
-                ->route('users.index')
-                ->with('success', $result['message']);
-        } catch (\Exception $e) {
-            $error = [
-                "success" => false,
-                "message" => "Echec de la mise à jour du statut",
-                "error" => $e->getMessage()
-            ];
-
-            if($request->expectsJson()) {
-                return response()->json($error, 500);
-            }
-
-            return back()->withErrors($error['message']);
+        if($request->expectsJson()) {
+            return response()->json([
+                "success" => true,
+                'message' => "Champ $field mis à jour avec succès",
+                "data" =>$user
+            ], 200);
         }
+
+        return redirect()->route('me')->with('succès', "Votre $field a été mis à jour !");
     }
 
     #[OA\Delete(

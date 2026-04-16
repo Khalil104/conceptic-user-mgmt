@@ -1,5 +1,13 @@
 <?php $__env->startSection('title', 'Me | Conceptic User Mgmt'); ?>
 
+<?php if(session('succès')): ?>
+    <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+        <?php echo e(session('succès')); ?>
+
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+    </div>
+<?php endif; ?>
+
 <?php $__env->startSection('content'); ?>
 
     <div class="container mt-4">
@@ -13,7 +21,17 @@
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li><a href="<?php echo e(route('about')); ?>" class="dropdown-item">À propos</a></li>
                     <li><a href="#" class="dropdown-item">Paramètres</a></li>
-                    <li><a href="<?php echo e(route('logout')); ?>" class="dropdown-item text-danger">Se déconnecter</a></li>
+                    <li>
+                        <a href="#"
+                            onclick="event.preventDefault();
+                            document.getElementById('logout-form').submit();"
+                            class="dropdown-item text-danger">
+                            Se déconnecter
+                        </a>
+                        <form id="logout-form" action="<?php echo e(route('logout')); ?>" method="post" style="display: none;">
+                            <?php echo csrf_field(); ?>
+                        </form>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -25,7 +43,7 @@
                     <div class="card-body">
                         <h5 class="card-title">Nom et Prénom(s)</h5>
                         <p><?php echo e($user->name); ?></p>
-                        <a href="#">
+                        <a href="<?php echo e(route('update.show', ['user' => $user->id, 'field' => 'name'])); ?>">
                             <button class="btn btn-outline-primary">Modifier</button>
                         </a>
                     </div>
@@ -38,7 +56,7 @@
                     <div class="card-body">
                         <h5 class="card-title">Adresse mail</h5>
                         <p><?php echo e($user->email); ?></p>
-                         <a href="#">
+                         <a href="<?php echo e(route('update.show', ['user' =>$user->id, 'field' => 'email'])); ?>">
                             <button class="btn btn-outline-primary">Modifier</button>
                         </a>
                     </div>
@@ -62,7 +80,7 @@
                     <div class="card-body d-flex justify-content-between align-items-center">
                         <h5 class="card-title">Statut</h5>
                         <p><?php echo e($user->status); ?></p>
-                         <a href="#">
+                         <a href="<?php echo e(route('update.show', ['user' => $user->id, 'field' => 'status'])); ?>">
                             <button class="btn btn-outline-primary ">Modifier</button>
                         </a>
                     </div>
@@ -75,9 +93,9 @@
                             'deleted' => 'bg-danger'
                         ];
                     ?>
-                   
+
                     <span class=" mt-4 badge rounded-pill <?php echo e($colors[$user->status] ?? 'bg-secondary'); ?>">&nbsp;</span>
-                    
+
                 </div>
             </div>
         </div>
@@ -87,9 +105,9 @@
     <div class="mt-4">
         <form method="post" action="#">
             <?php echo csrf_field(); ?>
-            <button type="submit" class="btn btn-danger" onclick="'return confirm('Voulez-vous supprimer votre compte ? Cette action est irréversible.')">
+            <button type="submit" class="btn btn-danger" onclick="return confirm('Voulez-vous supprimer votre compte ? Cette action est irréversible.')">
                 Supprimer mon compte
-            </button>       
+            </button>
         </form>
     </div>
 <?php $__env->stopSection(); ?>
@@ -97,4 +115,5 @@
 <?php $__env->startSection('footer'); ?>
     &copy; 2026 conceptic.io. Tout droits réservés
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('base', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /home/rhd-khalil/Abdoul-project/conceptic_user_mgmt/resources/views/auth/me.blade.php ENDPATH**/ ?>

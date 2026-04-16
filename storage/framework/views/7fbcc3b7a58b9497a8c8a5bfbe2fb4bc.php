@@ -31,7 +31,7 @@
 <body>
     <main class="container my-5">
         <?php if(session('success')): ?>
-            <div class="alert alert-success">
+            <div class="alert alert-success text-center">
                 <?php echo e(session('success')); ?>
 
             </div>

@@ -40,11 +40,6 @@ class UserService
         return $this->userRepository->update($id, $data);
     }
 
-    public function changeUserStatus(string $id, string $status)
-    {
-        return $this->userRepository->changeStatus($id, $status);
-    }
-
    public function deleteUser(string $id)
    {
     return $this->userRepository->delete($id);

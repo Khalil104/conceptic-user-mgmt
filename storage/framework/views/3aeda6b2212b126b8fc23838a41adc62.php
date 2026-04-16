@@ -1,14 +1,13 @@
-@extends('base')
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="container mt-4">
         <h2 class="mb-4">À Propos</h2>
 
-        {{-- Message principal --}}
+        
         <div class="alert alert-info">
             <p class="text-center">Vue about accessible</p>
         </div>
 
-        {{-- Description de l'application --}}
+        
         <div class="card mb-3 shadow-sm">
             <div class="card-body">
                 <h5 class="card-title">Description de l'application</h5>
@@ -20,7 +19,7 @@
             </div>
         </div>
 
-        {{-- Stack --}}
+        
         <div class="card mb-3 shadow-sm">
             <div class="card-body">
                 <h5 class="card-title">Stack Technique</h5>
@@ -30,7 +29,7 @@
             </div>
         </div>
 
-        {{-- Développeur --}}
+        
         <div class="card mb-3 shadow-sm">
             <div class="card-body">
                 <h5 class="card-title">Développeur</h5>
@@ -40,8 +39,10 @@
             </div>
         </div>
 
-        @section('footer')
+        <?php $__env->startSection('footer'); ?>
             &copy; 2026 conceptic.io. Tout droits réservés
-        @endsection
+        <?php $__env->stopSection(); ?>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('base', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /home/rhd-khalil/Abdoul-project/conceptic_user_mgmt/resources/views/auth/about.blade.php ENDPATH**/ ?>

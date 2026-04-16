@@ -191,10 +191,6 @@ class AuthController extends Controller
         return view('auth.about');
     }
 
-    public function settings() {
-        return view('auth.settings');
-    }
-
     #[OA\Get(
         path: "/api/dashboard",
         summary: "Récupérer l'utilisateur connecté/Accéder à son dashboard",

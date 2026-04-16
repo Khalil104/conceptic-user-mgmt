@@ -53,13 +53,17 @@ Route::middleware('web')->group(function () {
 
     Route::get('/me', [AuthController::class, 'me'])->name('me');
 
-    Route::delete('/users/{user}', [UserController::class, 'delete'])->name('delete.process');
+    Route::get('/me/update/{user}/{field}', [UserController::class, 'updateShow'])->name('update.show');
 
-    Route::put('/users/{user}', [UserController::class, 'update'])->name('update.process');
+    Route::put('/me/update/{user}/{field}', [UserController::class, 'update'])->name('update.process');
+
+    
 
     Route::get('/about', [AuthController::class, 'about'])->name('about');
 
-    Route::get('/settings', [AuthController::class, 'settings'])->name('settings');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    //
 
     Route::get('/users', [UserController::class, 'all']);
 
@@ -67,7 +71,7 @@ Route::middleware('web')->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::delete('/users/{user}', [UserController::class, 'delete'])->name('delete.process');
 
 });
 
