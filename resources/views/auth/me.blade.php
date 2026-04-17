@@ -104,9 +104,11 @@
 
     {{-- Supprimer compte --}}
     <div class="mt-4">
-        <form method="post" action="#">
+        <form method="post" action="{{ route('delete.process', ['id' => $user->id]) }}">
             @csrf
-            <button type="submit" class="btn btn-danger" onclick="return confirm('Voulez-vous supprimer votre compte ? Cette action est irréversible.')">
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger"
+                onclick="return confirm('Voulez-vous supprimer votre compte ? Cette action est irréversible.')">
                 Supprimer mon compte
             </button>
         </form>

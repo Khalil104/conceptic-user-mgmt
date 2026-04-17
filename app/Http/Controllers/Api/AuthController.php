@@ -217,31 +217,14 @@ class AuthController extends Controller
         return view('auth.me', ['user' => $result['data']]);
     }
 
-    //
-    public function processDisabled(Request $request)
-    {
-        if ($request->choice === 'yes') {
-            $result = $this->authService->requestRestoration($request->email);
-
-            if ($request->expectsJson()) {
-                return response()->json($result, $result['status']);
-            }
-
-            if (!$result['success']) {
-                return back()->withErrors($result['message']);
-            }
-
-            return redirect()->route('login.show')->with('info', 'Restauration annulé');
-        }
-    }
-
-    //
     public function showRestore()
     {
         return view('auth.restore');
     }
 
-    //
+    public function showConfirmationRestore() {
+        return view('auth.confirm-restore');
+    }
     public function requestRestoration(Request $request) {
 
         $result = $this->authService->requestRestoration($request->email);
@@ -254,8 +237,9 @@ class AuthController extends Controller
             return back()->withErrors($result['message']);
         }
 
+        session(['restore_email' =>$request->email]);
 
-        return redirect()->route('restore-account.show')->with('success', $result['message']);
+        return redirect()->route('confirm-restore.show')->with('success', $result['message']);
     }
 
     //

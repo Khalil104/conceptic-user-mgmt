@@ -26,12 +26,9 @@ Route::get('/login', [AuthController::class , 'showLogin'])->name('login.show');
 
 Route::get('/verify-2fa', [AuthController::class, 'showVerify'])->name('verify-2fa.show');
 
-Route::get('/restore-account', [AuthController::class, 'showRestore'])->name('restore-account.show');
-
-Route::get('/account-disabled', [AuthController::class, 'showChoice'])->name('account-disabled.show');
+Route::get('/account-disabled', [AuthController::class, 'showRestore'])->name('account-disabled.show');
 
 Route::get('/activate/{token}', [ActivationController::class, 'activate'])->name('activate');
-
 
 // --- process ---
 
@@ -43,9 +40,14 @@ Route::post('/verify-2fa', [AuthController::class, 'verify2fa'])->name('verify-2
 
 Route::post('/account-disabled', [AuthController::class, 'processDisabled'])->name('account-disabled.process');
 
+Route::get('/restore-account', [AuthController::class, 'showRestore'])->name('restore-account.show');
+
 Route::post('/restore-account', [AuthController::class, 'requestRestoration'])->name('restore-account.process');
 
+Route::get('/restore-confirm', [AuthController::class, 'showConfirmationRestore'])->name('confirm-restore.show');
+
 Route::post('/restore-confirm', [AuthController::class, 'confirmRestoration'])->name('confirm-restore.process');
+
 
 // Route web.php
 
@@ -57,11 +59,11 @@ Route::middleware('web')->group(function () {
 
     Route::put('/me/update/{user}/{field}', [UserController::class, 'update'])->name('update.process');
 
-    
+    Route::get('/me/about', [AuthController::class, 'about'])->name('about');
 
-    Route::get('/about', [AuthController::class, 'about'])->name('about');
+    Route::post('/me/logout', [AuthController::class, 'logout'])->name('logout');
 
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::delete('/me/delete/{id}', [UserController::class, 'delete'])->name('delete.process');
 
     //
 
@@ -70,8 +72,6 @@ Route::middleware('web')->group(function () {
     Route::get('/users/{user}', [UserController::class, 'find']);
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-
-    Route::delete('/users/{user}', [UserController::class, 'delete'])->name('delete.process');
 
 });
 

@@ -103,9 +103,11 @@
 
     
     <div class="mt-4">
-        <form method="post" action="#">
+        <form method="post" action="<?php echo e(route('delete.process', ['id' => $user->id])); ?>">
             <?php echo csrf_field(); ?>
-            <button type="submit" class="btn btn-danger" onclick="return confirm('Voulez-vous supprimer votre compte ? Cette action est irréversible.')">
+            <?php echo method_field('DELETE'); ?>
+            <button type="submit" class="btn btn-danger"
+                onclick="return confirm('Voulez-vous supprimer votre compte ? Cette action est irréversible.')">
                 Supprimer mon compte
             </button>
         </form>

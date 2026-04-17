@@ -158,6 +158,30 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         $user->$field = $request->input($field);
+
+        if($request->email === $user->email) {
+
+            if($request->expectsJson()) {
+                return response()->json([
+                    "success" =>false,
+                    "message" => "L'email est déjà utilisé par un autre utilisateur.",
+                ], 401);
+            }
+
+            return back()->withErrors('L\'email est déjà utilisé par un autre utilisateur.');
+        }
+
+        if($request->status !== $user->status) {
+
+            if($request->expectsJson()) {
+                response()->json([
+                    "success" =>false,
+                    "message" => "Le statut doit être exactement : active | inactive | suspended | deleted"
+                ], 401);
+            }
+            return back()->withErrors('Le statut doit être exactement : active | inactive | suspended | deleted');
+        }
+
         $user->save();
 
         if($request->expectsJson()) {
