@@ -49,3 +49,4 @@ class DashboardController extends Controller
         return view('auth.dashboard', compact('stats', 'users', 'user'));
     }
 }
+

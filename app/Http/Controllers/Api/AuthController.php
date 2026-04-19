@@ -187,7 +187,8 @@ class AuthController extends Controller
         return redirect()->route('me')->with('success', 'Compte vérifié avec succès !');
     }
 
-    public function about() {
+    public function about()
+    {
         return view('auth.about');
     }
 
@@ -222,10 +223,13 @@ class AuthController extends Controller
         return view('auth.restore');
     }
 
-    public function showConfirmationRestore() {
+    public function showConfirmationRestore()
+    {
         return view('auth.confirm-restore');
     }
-    public function requestRestoration(Request $request) {
+
+    public function requestRestoration(Request $request)
+    {
 
         $result = $this->authService->requestRestoration($request->email);
 
@@ -242,7 +246,7 @@ class AuthController extends Controller
         return redirect()->route('confirm-restore.show')->with('success', $result['message']);
     }
 
-    //
+    // Swagger
     public function confirmRestoration(Request $request)
     {
         $result = $this->authService->confirmRestoration($request->email, $request->code);

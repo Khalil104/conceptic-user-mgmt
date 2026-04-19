@@ -48,7 +48,6 @@ Route::get('/restore-confirm', [AuthController::class, 'showConfirmationRestore'
 
 Route::post('/restore-confirm', [AuthController::class, 'confirmRestoration'])->name('confirm-restore.process');
 
-
 // Route web.php
 
 Route::middleware('web')->group(function () {
@@ -64,12 +63,6 @@ Route::middleware('web')->group(function () {
     Route::post('/me/logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::delete('/me/delete/{id}', [UserController::class, 'delete'])->name('delete.process');
-
-    //
-
-    Route::get('/users', [UserController::class, 'all']);
-
-    Route::get('/users/{user}', [UserController::class, 'find']);
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 

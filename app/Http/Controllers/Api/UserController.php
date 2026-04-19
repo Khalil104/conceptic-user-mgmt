@@ -14,11 +14,10 @@ use OpenApi\Attributes as OA;
 #[OA\Info(
     title: "User Management API",
     version: "1.0.0",
-    description: "Documentation de l'API de gestion des utilisateurs",
+    description: "API de gestion des utilisateurs",
     contact: new OA\Contact(email: "rachidbissare@gmail.com")
 )]
-
-#[OA\Server(url: "/api", description: "Serveur Local")]
+#[OA\Server(url: "/api", description: "Serveur local")]
 
 #[OA\Schema(
     schema: "User",
@@ -40,11 +39,12 @@ class UserController extends Controller
         $this->userService = $userService;
     }
 
-    public function index() {
+    public function index()
+    {
         return view("index");
     }
 
-     #[OA\Get(
+    #[OA\Get(
         path: "/users",
         summary: "Liste des utilisateurs",
         tags: ["Users"],
@@ -93,11 +93,7 @@ class UserController extends Controller
             new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "string"))
         ],
         responses: [
-            new OA\Response(
-                response: 200,
-                description: "Succès",
-                content: new OA\JsonContent(properties: [new OA\Property(property: "data", ref: "#/components/schemas/User")])
-            ),
+            new OA\Response(response: 200, description: "Succès", content: new OA\JsonContent(properties: [new OA\Property(property: "data", ref: "#/components/schemas/User")])),
             new OA\Response(response: 404, description: "Non trouvé")
         ]
     )]
@@ -118,23 +114,6 @@ class UserController extends Controller
         }
     }
 
-    #[OA\Put(
-        path: "/users/{id}",
-        summary: "Modifier un utilisateur",
-        tags: ["Users"],
-        parameters: [
-            new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "string"))
-        ],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(ref: "#/components/schemas/User")
-        ),
-        responses: [
-            new OA\Response(response: 200, description: "Mis à jour"),
-            new OA\Response(response: 500, description: "Erreur")
-        ]
-    )]
-
      public function updateShow($id,  $field)
     {
         $user = User::findOrFail($id);
@@ -154,6 +133,24 @@ class UserController extends Controller
 
          return view('auth.update', compact('user', 'field'));
     }
+
+    #[OA\Put(
+        path: "/users/{id}",
+        summary: "Modifier un utilisateur",
+        tags: ["Users"],
+        parameters: [
+            new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "string"))
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(ref: "#/components/schemas/User")
+        ),
+        responses: [
+            new OA\Response(response: 200, description: "Mis à jour"),
+            new OA\Response(response: 401, description: "Validation échouée"),
+            new OA\Response(response: 500, description: "Erreur serveur")
+        ]
+    )]
     public function update(Request $request, $id, $field)
     {
         $user = User::findOrFail($id);
@@ -195,7 +192,7 @@ class UserController extends Controller
         return redirect()->route('me')->with('succès', "Votre $field a été mis à jour !");
     }
 
-    #[OA\Delete(
+   #[OA\Delete(
         path: "/users/{id}",
         summary: "Supprimer un utilisateur",
         tags: ["Users"],
@@ -204,7 +201,8 @@ class UserController extends Controller
         ],
         responses: [
             new OA\Response(response: 200, description: "Supprimé"),
-            new OA\Response(response: 500, description: "Erreur")
+            new OA\Response(response: 404, description: "Non trouvé"),
+            new OA\Response(response: 500, description: "Erreur serveur")
         ]
     )]
    public function delete(Request $request, string $id)
