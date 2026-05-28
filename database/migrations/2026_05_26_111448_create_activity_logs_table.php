@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('activity_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
+            $table->uuid('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('action'); // ex: 'login_success', 'user_created, 'login_failed', 'user_deleted', '2fa_failed', 'user_updated'
             $table->string('description'); // Modification de l'email par l'admin
             $table->json('changes')->nullable(); // Pourstocker d'anciennes/nouvelles valeurs
