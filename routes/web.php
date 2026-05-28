@@ -7,6 +7,9 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ActivationController;
+use App\Http\Controllers\Api\ActivityLogController;
+use App\Models\ActivityLog;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -15,6 +18,8 @@ use App\Http\Controllers\Api\ActivationController;
 
 // Route de la page d'accueil
 Route::get('/', [UserController::class, 'index'])->name('index');
+
+Route::get('/admin/logs', [ActivityLogController::class, 'index'])->name('admin.logs.index');
 
 // --- Routes d'Authentification (Publiques) ---
 
@@ -65,6 +70,8 @@ Route::middleware('web')->group(function () {
     Route::delete('/me/delete/{id}', [UserController::class, 'delete'])->name('delete.process');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+
+    
 
 });
 
