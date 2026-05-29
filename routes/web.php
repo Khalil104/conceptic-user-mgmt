@@ -19,7 +19,15 @@ use App\Models\ActivityLog;
 // Route de la page d'accueil
 Route::get('/', [UserController::class, 'index'])->name('index');
 
+// Nous le remettrons plus tard dans le middleware
 Route::get('/admin/logs', [ActivityLogController::class, 'index'])->name('admin.logs.index');
+Route::patch('users/{id}/update/{field}', [UserController::class, 'update'])->name('users.update.field');
+
+Route::get('/test-notification', function () {
+    $user = \App\Models\User::first();
+    $user->notify(new \App\Notifications\UserRoleChangedNotification('user'));
+    return 'Notification envoyée ! Vérifions la base de données.';
+});
 
 // --- Routes d'Authentification (Publiques) ---
 
@@ -33,6 +41,10 @@ Route::get('/verify-2fa', [AuthController::class, 'showVerify'])->name('verify-2
 
 Route::get('/account-disabled', [AuthController::class, 'showRestore'])->name('account-disabled.show');
 
+Route::get('/restore-confirm', [AuthController::class, 'showConfirmationRestore'])->name('confirm-restore.show');
+
+Route::get('/restore-account', [AuthController::class, 'showRestore'])->name('restore-account.show');
+
 Route::get('/activate/{token}', [ActivationController::class, 'activate'])->name('activate');
 
 // --- process ---
@@ -45,11 +57,7 @@ Route::post('/verify-2fa', [AuthController::class, 'verify2fa'])->name('verify-2
 
 Route::post('/account-disabled', [AuthController::class, 'processDisabled'])->name('account-disabled.process');
 
-Route::get('/restore-account', [AuthController::class, 'showRestore'])->name('restore-account.show');
-
 Route::post('/restore-account', [AuthController::class, 'requestRestoration'])->name('restore-account.process');
-
-Route::get('/restore-confirm', [AuthController::class, 'showConfirmationRestore'])->name('confirm-restore.show');
 
 Route::post('/restore-confirm', [AuthController::class, 'confirmRestoration'])->name('confirm-restore.process');
 
@@ -62,6 +70,8 @@ Route::middleware('web')->group(function () {
     Route::get('/me/update/{user}/{field}', [UserController::class, 'updateShow'])->name('update.show');
 
     Route::put('/me/update/{user}/{field}', [UserController::class, 'update'])->name('update.process');
+
+    Route::patch('users/{id}/update/{field}', [UserController::class, 'update'])->name('users.update.field');
 
     Route::get('/me/about', [AuthController::class, 'about'])->name('about');
 

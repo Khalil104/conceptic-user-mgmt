@@ -10,6 +10,9 @@ use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
+use Exception;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 #[OA\Info(
     title: "User Management API",
@@ -32,7 +35,7 @@ use OpenApi\Attributes as OA;
 )]
 class UserController extends Controller
 {
-    protected $userService;
+    protected UserService $userService;
 
     public function __construct(UserService $userService)
     {
@@ -114,7 +117,7 @@ class UserController extends Controller
         }
     }
 
-     public function updateShow($id,  $field)
+     public function updateShow( string $id,  string $field): View
     {
         $user = User::findOrFail($id);
         return view('auth.update', compact('user', 'field'));
@@ -151,45 +154,37 @@ class UserController extends Controller
             new OA\Response(response: 500, description: "Erreur serveur")
         ]
     )]
-    public function update(Request $request, $id, $field)
+    public function update(Request $request, string $id, string $field): JsonResponse|RedirectResponse
     {
-        $user = User::findOrFail($id);
-        $user->$field = $request->input($field);
+        // -@- Assurons nous que la requête contient bien la valeur pour le champ dynamique
+        $value = $request->input($field);
 
-        if($request->email === $user->email) {
+        try{
+            // Déléguons toute la logique au service
+            $user = $this->userService->updateField($id, $field, $value);
 
+            // Répondons ceci en cas de succès
             if($request->expectsJson()) {
                 return response()->json([
-                    "success" =>false,
-                    "message" => "L'email est déjà utilisé par un autre utilisateur.",
-                ], 401);
+                    "success" => true,
+                    "message" => "Champ $field mis à jour avec succès",
+                    "data" => $user
+                ], 200);
             }
 
-            return back()->withErrors('L\'email est déjà utilisé par un autre utilisateur.');
-        }
-
-        if($request->status !== $user->status) {
-
+            return redirect()->route('me')->with('success', "Votre $field a été mis à jour");
+        } catch (Exception $e) {
+            // Répondons ceci en cas d'échec (Validation métier échouée)
             if($request->expectsJson()) {
-                response()->json([
-                    "success" =>false,
-                    "message" => "Le statut doit être exactement : active | inactive | suspended | deleted"
-                ], 401);
+                return response()->json([
+                    "success" => false,
+                    "message" => $e->getMessage(),
+                ], 422);
             }
-            return back()->withErrors('Le statut doit être exactement : active | inactive | suspended | deleted');
+
+            return back()->withErrors($e->getMessage())->withInput();
         }
 
-        $user->save();
-
-        if($request->expectsJson()) {
-            return response()->json([
-                "success" => true,
-                'message' => "Champ $field mis à jour avec succès",
-                "data" =>$user
-            ], 200);
-        }
-
-        return redirect()->route('me')->with('succès', "Votre $field a été mis à jour !");
     }
 
    #[OA\Delete(

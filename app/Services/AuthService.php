@@ -149,6 +149,7 @@ class AuthService
         ];
     }
 
+    // -@-
     public function getAuthenticatedUser($request)
     {
         $user = $this->authRepository->getAuthenticatedUser($request);

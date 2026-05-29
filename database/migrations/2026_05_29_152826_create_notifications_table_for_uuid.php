@@ -6,25 +6,24 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('type');
-            $table->morphs('notifiable');
+            
+            // Morphs optimisé pour UUID
+            $table->uuidMorphs('notifiable');
+            
             $table->text('data');
             $table->timestamp('read_at')->nullable();
             $table->timestamps();
-            //
+
+            // Index explicite
+            $table->index(['notifiable_type', 'notifiable_id'], 'notifications_notifiable_index');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('notifications');
