@@ -14,6 +14,6 @@ class NotificationController extends Controller
      */
     public function notifications(Request $request)
     {
-        $user = $this->authRepository->getAuthenticatedUser();
+        $user = $this->authRepository->getAuthenticatedUser($request);
     }
 }

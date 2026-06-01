@@ -12,6 +12,7 @@ use App\Mail\RestoreAccountCode;
 use App\Models\VerificationCode;
 use Illuminate\Support\Facades\Mail;
 use OpenApi\Attributes as OA;
+use App\Traits\HasCustomAuth;
 
 
 #[OA\SecurityScheme(
@@ -22,6 +23,9 @@ use OpenApi\Attributes as OA;
 )]
 class AuthController extends Controller
 {
+
+    use HasCustomAuth;
+
     protected $authService;
 
     public function __construct(AuthService $authService)
@@ -263,6 +267,64 @@ class AuthController extends Controller
         session(['user_id' => $result['data']->id]);
 
         return redirect()->route('me')->with('success', $result['message']);
+    }
+
+    // Lise des notifications
+    public function notifications(Request $request)
+    {
+        $user = $this->getAuthenticatedUser($request);
+
+        if(!$user) {
+            return redirect()->route('login.show')->with('error', 'Vous devez être connecté.');
+        }
+
+        $notifications = $user->notifications()
+                            ->latest()
+                            ->paginate(15);
+        
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'unread_count' => $user->unreadNotifications()->count(),
+                'notifications' => $notifications
+            ]);
+        }
+
+        return view('dashboard.notifications.index', compact('notifications'));
+    }
+
+    // Marquons une notification comme lue.
+    public function markAsRead(Request $request, string $id)
+    {
+        $user = $this->getAuthenticatedUser($request);
+        if (!$user) {
+            return response()->json([
+                'success' => false
+            ], 401);
+        }
+
+        $notification = $user->notifications()->findOrFail($id);
+        $notification->markAsRead();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true      
+            ]);
+        }
+        return back()->with('success', 'Notification marquée comme lue.');
+    }
+
+    // Marquons toutes comme lues
+    public function markAllAsRead(Request $request)
+    {
+        $user = $this->getAuthenticatedUser($request);
+        if ($user) {
+            return response()->json([
+                'success' => true
+            ]);
+        }
+
+        return back()->with('success', 'Toutes les notifications ont été marquées comme lues.');
     }
 
     #[OA\Post(

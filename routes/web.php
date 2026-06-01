@@ -81,8 +81,11 @@ Route::middleware('web')->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-    
+    Route::get('/notifications', [AuthController::class, 'notifications'])->name('notification.index');
 
+    Route::post('/notifications/{id}/read', [AuthController::class], 'markAsRead')->name('notifications.read');
+    
+    Route::post('notifications/mark-all-read', AuthController::class, 'markAllAsRead')->name('notifications.mark-all-read');
 });
 
 // --- Routes protégées (Middleware Sanctum) ---
