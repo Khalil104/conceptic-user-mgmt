@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
                     'password' => bcrypt('AbdoulRachid@123'),
                 ]); 
 
-                // 3. Créer 28 utilisateurs aléatoires
+                // 3. Créer 22 utilisateurs aléatoires
                 User::factory()->count(22)->create([
                     'password' => bcrypt('passwordUser'),
                 ]);

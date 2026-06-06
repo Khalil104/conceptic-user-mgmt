@@ -10,9 +10,11 @@ use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
-use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use App\Traits\HasCustomAuth;
+use Exception;
+use Illuminate\Testing\Fluent\Concerns\Has;
 
 #[OA\Info(
     title: "User Management API",
@@ -35,6 +37,8 @@ use Illuminate\View\View;
 )]
 class UserController extends Controller
 {
+    use HasCustomAuth;
+
     protected UserService $userService;
 
     public function __construct(UserService $userService)
@@ -225,5 +229,20 @@ class UserController extends Controller
 
         return back()->withErrors('Erreur lors de la suppression' .$e->getMessage());
     }
+   }
+
+   /**
+    * Exportons Excel/CSV des utilisateurs ()
+    */
+   public function export(Request $request)
+   {
+    $user = $this->getAuthenticatedUser($request);
+    if(!$user || $user->role !== 'admin') {
+        return response()->json([
+            'success' => false,
+            'message' => 'Accès refusé'
+        ], 403);
+    }
+    return $this->userService->exportUsers();
    }
 }

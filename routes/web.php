@@ -86,6 +86,8 @@ Route::middleware('web')->group(function () {
     Route::post('/notifications/{id}/read', [AuthController::class, 'markAsRead'])->name('notifications.read');
     
     Route::post('notifications/mark-all-read', [AuthController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+
+    Route::get('/admin/users/export', [UserController::class, 'export'])->name('admin.users.export');
 });
 
 // --- Routes protégées (Middleware Sanctum) ---

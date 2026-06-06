@@ -8,6 +8,9 @@ use  Illuminate\Support\Facades\Mail;
 use App\Mail\ActivationMail;
 use App\Notifications\UserRoleChangedNotification;
 use InvalidArgumentException;
+use App\Exports\UsersExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Excel as ExcelWriter;
 
 class UserService
 {
@@ -25,7 +28,7 @@ class UserService
     {
         return $this->userRepository->create($data);
     }
-    // logique d'affichage des utili sateurs
+    // logique d'affichage des utilisateurs
     public function listUsers(array $filters)
     {
         return $this->userRepository->All($filters);
@@ -78,4 +81,22 @@ class UserService
    {
     return $this->userRepository->delete($id);
    }
+
+   /**
+    * Exportons des utilisateurs
+    */
+   public function exportUsers()
+   {
+        $timestamp = now()->format('Y-m-d_H-i-s');
+        $filename = "utilisateurs_{$timestamp}.xlsx";
+
+        return Excel::download (
+            new UsersExport, 
+            $filename,
+            ExcelWriter::XLSX,
+            [
+                'Content-type' =>'text/xlsx',
+            ]
+        );
+    }
 }

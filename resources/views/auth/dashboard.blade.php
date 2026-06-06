@@ -18,6 +18,11 @@
                     @csrf
                 </form>
             </li>
+            <li>
+                <a href="{{ route('admin.users.export') }}" class="dropdown-item">
+                    <i class="bi bi-download"> Exporter les utilisateurs (Excel)</i>
+                </a>
+            </li>
         </ul>
     </div>
 </div>

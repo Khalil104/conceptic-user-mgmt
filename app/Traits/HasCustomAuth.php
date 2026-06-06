@@ -4,7 +4,6 @@ namespace App\Traits;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-
 trait HasCustomAuth
 
 {
