@@ -1,133 +1,86 @@
-# 🚀 Laravel User Management API
+# Laravel User Management API - Branche `test`
 
-Ce projet est une API REST de gestion d'utilisateurs développée avec **Laravel 11**. Elle implémente une architecture propre avec le **Pattern Repository/Service**, une validation stricte via les **Form Requests** et une documentation OpenAPI ex Swagger complète.
+> Cette branche est conservée volontairement à des fins d'évaluation et de comparaison.
+>
+> Elle représente une version intermédiaire du projet avant la refonte majeure réalisée dans la branche `refactor/v2`.
+>
+> Pour une documentation complète, la version finale de l'architecture, les choix techniques détaillés et les évolutions apportées, veuillez consulter les branches **`refactor/v2`** ou **`master`**.
 
-## 📋 Fonctionnalités
+## Présentation
 
-* **CRUD Complet** : Création, lecture, mise à jour et suppression d'utilisateurs.
-* **Validation avancée** : Gestion des doublons d'emails et formats de données.
-* **Architecture Pro** : Découplage de la logique (Controller -> Service -> Repository).
-* **Documentation Interactive** : Swagger UI intégré.
-* **Qualité Logicielle** : Tests unitaires et fonctionnels avec rapport de couverture.
+Cette application est une API REST de gestion d'utilisateurs développée avec Laravel.
 
----
+Les principaux objectifs de cette version sont :
 
-## 🛠️ Prérequis
+- Implémenter un CRUD utilisateur complet.
+- Appliquer le pattern Repository / Service.
+- Utiliser les Form Requests pour la validation.
+- Documenter l'API avec Swagger.
+- Mettre en place une stratégie de tests automatisés.
 
-* **PHP** >= 8.2 (avec extension **PCOV** pour la couverture de tests)
-* **Composer**
-* **PostgreSQL** ou **SQLite**(pour les tests)  
-* **Git**
+## Fonctionnalités
 
----
+- Création, consultation, modification et suppression d'utilisateurs.
+- Validation des données côté serveur.
+- Documentation Swagger/OpenAPI.
+- Tests unitaires et fonctionnels.
+- Rapport de couverture de code.
 
-## ⚙️ Installation & Configuration
-
-### 1. Cloner et Installer
+## Installation rapide
 
 ```bash
-git clone https://github.com/Web104/laravel-app.git
-cd laravel-app
+git clone https://github.com/Web104/conceptic-user-mgmt.git (branch -> test)
+cd conceptic-user-mgmt
+
 composer install
 
-```
-
-### 2. Environnement
-
-```bash
 cp .env.example .env
 php artisan key:generate
 
-```
-
-*Note : Assurez-vous que les dossiers de stockage existent (requis pour Swagger sur Windows) :*
-
-```bash
-mkdir storage\framework\views
-
-```
-
-### 3. Base de données
-
-Configurez votre `.env`, puis :
-
-```bash
 php artisan migrate --seed
+```
 
-``` 
+## Documentation API
 
----
-
-## 📑 Documentation de l'API
-
-L'API est documentée avec **Swagger (L5-Swagger)**. En cas de modification des annotations, suivez ces étapes :
-
-### Générer la documentation
-
-Si vous rencontrez l'erreur `Required @OA\PathItem() not found`, nettoyez le cache avant de générer :
+Génération de la documentation :
 
 ```bash
 php artisan config:clear
 php artisan l5-swagger:generate
-
 ```
 
-### Accéder aux interfaces
+Accès à Swagger :
 
-* **Swagger UI (Interactif)** : `http://127.0.0.1:8000/api/documentation`
-* **Postman** : Importez le fichier généré situé dans `storage/api-docs/api-docs.json`.
+```text
+http://127.0.0.1:8000/api/documentation
+```
 
----
+## Tests
 
-## 🧪 Tests & Qualité
-
-Le projet inclut des tests unitaires (Models) et fonctionnels (API).
-
-### Exécuter les tests
+Exécution des tests :
 
 ```bash
 php artisan test
-
 ```
 
-### Couverture de code (Code Coverage)
-
-Pour générer le rapport de couverture (nécessite l'extension `pcov` ou `xdebug`) :
+Génération du rapport de couverture :
 
 ```bash
-# Rapport dans le terminal
-php artisan test --coverage
-
-# Rapport HTML détaillé (recommandé pour audit).
 php artisan test --coverage-html=tests/coverage
-
 ```
 
-*Le rapport sera disponible dans `tests/coverage/index.html`.*
+Le rapport sera disponible dans :
 
----
+```text
+tests/coverage/index.html
+```
 
-### Accéder aux interfaces
+## À propos de cette branche
 
-* **Swagger UI (Interactif)** : Rendez-vous sur `http://127.0.0.1:8000/api/documentation` pour tester l'API directement depuis le navigateur.
-* **Postman** : Pour importer les requêtes, ouvrez Postman > Import > Sélectionnez le fichier `storage/api-docs/api-docs.json`. Cela créera automatiquement une collection prête à l'emploi.
+Cette branche est principalement utilisée pour :
 
----
+- Évaluer l'évolution du projet.
+- Comparer l'ancienne et la nouvelle architecture.
+- Mesurer les améliorations apportées lors de la refonte.
 
-## 📁 Structure du Projet
-
-* **Controllers** : `app/Http/Controllers/Api` (Annotations Swagger en Attributes PHP 8.2)
-* **Services** : `app/Services` (Logique métier - **Couverture 100%**)
-* **Repositories** : `app/Repositories` (Abstraction de la base de données)
-* **Tests** : `tests/Feature` et `tests/Unit`
-
----
-
-## 🚀 Troubleshooting (Problèmes fréquents)
-
-* **Erreur 500 sur Swagger UI** : Lancez `php artisan view:clear` et vérifiez que le dossier `storage/framework/views` existe.
-* **Assets Swagger manquants** : Exécutez `php artisan vendor:publish --provider="L5Swagger\L5SwaggerServiceProvider"`.
-* **Tests échoués** : Vérifiez que votre fichier `phpunit.xml` utilise bien une base de données en mémoire (`sqlite` / `:memory:`).
-
----
-
+Les détails techniques complets, la documentation maintenue et la version recommandée du projet sont disponibles dans les branches **`refactor/v2`** et **`master`**.
