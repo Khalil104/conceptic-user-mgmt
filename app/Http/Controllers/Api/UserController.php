@@ -3,20 +3,27 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CreateUserRequest;
+
+use App\Models\User;
 use App\Http\Requests\UpdateUserRequest;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
+use App\Traits\HasCustomAuth;
+use Exception;
+use Illuminate\Testing\Fluent\Concerns\Has;
 
 #[OA\Info(
     title: "User Management API",
     version: "1.0.0",
-    description: "Documentation de l'API de gestion des utilisateurs",
+    description: "API de gestion des utilisateurs",
     contact: new OA\Contact(email: "rachidbissare@gmail.com")
 )]
-#[OA\Server(url: "/api", description: "Serveur Local")]
+#[OA\Server(url: "/api", description: "Serveur local")]
+
 #[OA\Schema(
     schema: "User",
     type: "object",
@@ -28,16 +35,23 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: "status", type: "string")
     ]
 )]
-class UserController extends Controller 
+class UserController extends Controller
 {
-    protected $userService;
+    use HasCustomAuth;
 
-    public function __construct(UserService $userService) 
+    protected UserService $userService;
+
+    public function __construct(UserService $userService)
     {
         $this->userService = $userService;
     }
 
-     #[OA\Get(
+    public function index()
+    {
+        return view("index");
+    }
+
+    #[OA\Get(
         path: "/users",
         summary: "Liste des utilisateurs",
         tags: ["Users"],
@@ -59,7 +73,7 @@ class UserController extends Controller
             )
         ]
     )]
-    public function all(Request $request): JsonResponse 
+    public function all(Request $request): JsonResponse
     {
         try {
             $filters = $request->only(['name', 'status', 'role']);
@@ -78,48 +92,6 @@ class UserController extends Controller
         }
     }
 
-    #[OA\Post(
-        path: "/users",
-        summary: "Créer un utilisateur",
-        tags: ["Users"],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(ref: "#/components/schemas/User")
-        ),
-        responses: [
-            new OA\Response(
-                response: 201,
-                description: "Utilisateur créé avec succès",
-                content: new OA\JsonContent(
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: true),
-                        new OA\Property(property: "message", type: "string", example: "Operation successful"),
-                        new OA\Property(property: "data", ref: "#/components/schemas/User")
-                    ]
-                )
-            ),
-            new OA\Response(response: 422, description: "Erreur de validation"),
-            new OA\Response(response: 500, description: "Erreur interne")
-        ]
-    )]
-    public function register(CreateUserRequest $request): JsonResponse 
-    {
-        try {
-            $user = $this->userService->createUser($request->validated());
-            return response()->json([
-                "success" => true,
-                "message" => "Inscription réussie !",
-                "data" => $user
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                "success" => false,
-                "message" => "Internal server error",
-                "error" => $e->getMessage()
-            ], 500);
-        }
-    }
-
     #[OA\Get(
         path: "/users/{id}",
         summary: "Détail d'un utilisateur",
@@ -128,15 +100,11 @@ class UserController extends Controller
             new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "string"))
         ],
         responses: [
-            new OA\Response(
-                response: 200,
-                description: "Succès",
-                content: new OA\JsonContent(properties: [new OA\Property(property: "data", ref: "#/components/schemas/User")])
-            ),
+            new OA\Response(response: 200, description: "Succès", content: new OA\JsonContent(properties: [new OA\Property(property: "data", ref: "#/components/schemas/User")])),
             new OA\Response(response: 404, description: "Non trouvé")
         ]
     )]
-    public function find(string $id): JsonResponse 
+    public function find(string $id): JsonResponse
     {
         try {
             $user = $this->userService->getUserById($id);
@@ -153,6 +121,26 @@ class UserController extends Controller
         }
     }
 
+     public function updateShow( string $id,  string $field): View
+    {
+        $user = User::findOrFail($id);
+        return view('auth.update', compact('user', 'field'));
+    }
+
+    public function edit(Request $request, string $id, string $field)
+    {
+        $user = $this->userService->getUserById($id);
+         if ($request->expectsJson()) {
+            return response()->json([
+                "success" => true,
+                "message" => "Edition du champ $field",
+                "data" => $user
+            ], 200);
+         }
+
+         return view('auth.update', compact('user', 'field'));
+    }
+
     #[OA\Put(
         path: "/users/{id}",
         summary: "Modifier un utilisateur",
@@ -166,28 +154,44 @@ class UserController extends Controller
         ),
         responses: [
             new OA\Response(response: 200, description: "Mis à jour"),
-            new OA\Response(response: 500, description: "Erreur")
+            new OA\Response(response: 401, description: "Validation échouée"),
+            new OA\Response(response: 500, description: "Erreur serveur")
         ]
     )]
-    public function update(UpdateUserRequest $request, string $id): JsonResponse 
+    public function update(Request $request, string $id, string $field): JsonResponse|RedirectResponse
     {
-        try {
-            $user = $this->userService->updateUser($id, $request->validated());
-            return response()->json([
-                "success" => true,
-                "message" => "User updated",
-                "data" => $user
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                "success" => false,
-                "message" => "update failed",
-                "error" => $e->getMessage()
-            ], 500);
+        // -@- Assurons nous que la requête contient bien la valeur pour le champ dynamique
+        $value = $request->input($field);
+
+        try{
+            // Déléguons toute la logique au service
+            $user = $this->userService->updateField($id, $field, $value);
+
+            // Répondons ceci en cas de succès
+            if($request->expectsJson()) {
+                return response()->json([
+                    "success" => true,
+                    "message" => "Champ $field mis à jour avec succès",
+                    "data" => $user
+                ], 200);
+            }
+
+            return redirect()->route('me')->with('success', "Votre $field a été mis à jour");
+        } catch (Exception $e) {
+            // Répondons ceci en cas d'échec (Validation métier échouée)
+            if($request->expectsJson()) {
+                return response()->json([
+                    "success" => false,
+                    "message" => $e->getMessage(),
+                ], 422);
+            }
+
+            return back()->withErrors($e->getMessage())->withInput();
         }
+
     }
 
-    #[OA\Delete(
+   #[OA\Delete(
         path: "/users/{id}",
         summary: "Supprimer un utilisateur",
         tags: ["Users"],
@@ -196,23 +200,49 @@ class UserController extends Controller
         ],
         responses: [
             new OA\Response(response: 200, description: "Supprimé"),
-            new OA\Response(response: 500, description: "Erreur")
+            new OA\Response(response: 404, description: "Non trouvé"),
+            new OA\Response(response: 500, description: "Erreur serveur")
         ]
     )]
-    public function delete(string $id): JsonResponse 
-    {
-        try {
-            $this->userService->deleteUser($id);
+   public function delete(Request $request, string $id)
+   {
+    try {
+        $this->userService->deleteUser($id);
+
+        if($request->expectsJson()) {
             return response()->json([
-                "success" => true,
-                "message" => "User deleted"
+                "success" =>true,
+                "message" =>"Utilisateur supprimé avec succès"
             ], 200);
-        } catch (\Exception $e) {
+        }
+
+        return back()->with('success', 'Utilisateur supprimé');
+
+    } catch( \Exception $e) {
+        if($request->expectsJson()) {
             return response()->json([
                 "success" => false,
-                "message" => "Delete failed",
-                "error" => $e->getMessage()
+                "message" =>"Echec de la suppression",
+                "error" =>$e->getMessage()
             ], 500);
         }
+
+        return back()->withErrors('Erreur lors de la suppression' .$e->getMessage());
     }
+   }
+
+   /**
+    * Exportons Excel/CSV des utilisateurs ()
+    */
+   public function export(Request $request)
+   {
+    $user = $this->getAuthenticatedUser($request);
+    if(!$user || $user->role !== 'admin') {
+        return response()->json([
+            'success' => false,
+            'message' => 'Accès refusé'
+        ], 403);
+    }
+    return $this->userService->exportUsers();
+   }
 }

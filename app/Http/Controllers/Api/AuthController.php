@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\User;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CreateUserRequest;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -11,6 +12,7 @@ use App\Mail\RestoreAccountCode;
 use App\Models\VerificationCode;
 use Illuminate\Support\Facades\Mail;
 use OpenApi\Attributes as OA;
+use App\Traits\HasCustomAuth;
 
 
 #[OA\SecurityScheme(
@@ -21,11 +23,60 @@ use OpenApi\Attributes as OA;
 )]
 class AuthController extends Controller
 {
+
+    use HasCustomAuth;
+
     protected $authService;
 
     public function __construct(AuthService $authService)
     {
         $this->authService = $authService;
+    }
+
+     public function showRegister() {
+        return view('public.register');
+    }
+
+    #[OA\Post(
+        path: "/users",
+        summary: "Créer un utilisateur",
+        tags: ["Users"],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(ref: "#/components/schemas/User")
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: "Utilisateur créé avec succès",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Operation successful"),
+                        new OA\Property(property: "data", ref: "#/components/schemas/User")
+                    ]
+                )
+            ),
+            new OA\Response(response: 422, description: "Erreur de validation"),
+            new OA\Response(response: 500, description: "Erreur interne")
+        ]
+    )]
+    public function  register(CreateUserRequest $request)
+    {
+        $result = $this->authService->createUser($request->validated());
+
+        if($request->expectsJson()) {
+            return response()->json($result, $result['status']);
+        }
+
+        return view('auth.register_success')->with('Compte créé avec succès ! Vérifiez votre boîte mail pour activer votre compte.');
+
+    }
+
+    //
+    public function showLogin()
+    {
+        return view('public.login');
     }
 
     #[OA\Post(
@@ -47,37 +98,43 @@ class AuthController extends Controller
             new OA\Response(response: 401, description: "Identifiants incorrects")
         ]
     )]
-   public function login(Request $request): JsonResponse
-    {
+   public function login(Request $request)
+   {
         $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
+            'email' => ['required', 'email'],
+            'password' => ['required'],
         ]);
 
         $result = $this->authService->login($credentials);
 
-        // 1. On traite les échecs explicites
-        if (isset($result['success']) && $result['success'] === false) {
-            return response()->json([
-                'success' => false,
-                'message' => $result['message']
-            ], $result['status'] ?? 401);
+        // 1. Echec explicite.
+        if(!$result['success']) {
+            if($request->expectsJson()) {
+                return response()->json($result, $result['status']);
+            }
+            if(!empty($result['can_restore'])) {
+                session(['user_id' => $credentials['email']]);
+                return redirect()->route('account-disabled.show')->withErrors($result['message']);
+            }
+            return back()->withErrors($result['message']);
         }
 
-        // 2. On vérifie qu'on a bien reçu un user_id avant de crier victoire
-        if (!isset($result['user_id'])) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Une erreur inattendue est survenue.'
-            ], 500);
+        if ($request->expectsJson()) {
+            return response()->json($result, 200);
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Login successful, please verify your email',
+        session([
             'user_id' => $result['user_id']
-        ], 200);
+        ]);
+
+        return redirect()->route('verify-2fa.show')->with('success', $result['message']);
+   }
+
+    public function showVerify()
+    {
+        return view('public.verify-2fa');
     }
+
     #[OA\Post(
         path: "/api/verify-2fa",
         summary: "Étape 2 : Validation du code 2FA",
@@ -97,30 +154,46 @@ class AuthController extends Controller
             new OA\Response(response: 422, description: "Code invalide ou expiré")
         ]
     )]
-    public function verify2FA(Request $request): JsonResponse
+    public function verify2fa(Request $request)
     {
+
         $request->validate([
             'user_id' => 'required|uuid|exists:users,id',
             'code' => 'required|string|size:6',
         ]);
 
-        $result = $this->authService->verify2FACode($request->user_id, $request->code);
+        $result = $this->authService->verify2fa($request->user_id, $request->code);
 
+        // Gestion des erreurs
         if (!$result['success']) {
-            // On s'assure d'utiliser 'status' ou 'code' selon ce que le service renvoit
             $errorCode = $result['code'] ?? $result['status'] ?? 422;
-            
-            return response()->json([
-                'success' => false,
-                'message' => $result['message']
-            ], $errorCode);
+
+            if($request->expectsJson()) {
+                return response()->json($result, $errorCode);
+            }
+
+            return back()->withErrors($result['message']);
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => "Compte vérifier avec succès !",
-            'data' => $result
-        ]);
+        // Succès
+        if($request->expectsJson()) {
+            return response()->json($result, 200);
+        }
+
+        $user = User::find($request->user_id);
+
+        session(['user_id' => $user->id]);
+
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard')->with('success', 'Bienvenue Admin !');
+        }
+
+        return redirect()->route('me')->with('success', 'Compte vérifié avec succès !');
+    }
+
+    public function about()
+    {
+        return view('auth.about');
     }
 
     #[OA\Get(
@@ -133,121 +206,125 @@ class AuthController extends Controller
             new OA\Response(response: 401, description: "Non authentifié")
         ]
     )]
-    public function me(Request $request): JsonResponse
+    public function me(Request $request)
     {
-        return response()->json([
-            'success' => true,
-            'data' => $request->user()
-        ]);
+
+        $result = $this->authService->getAuthenticatedUser($request);
+
+        if ($request->expectsJson()) {
+            return response()->json($result, $result['status']);
+        }
+
+        if (!$result['success']) {
+            return redirect()->route('login.show')->withErrors($result['message']);
+        }
+
+        return view('auth.me', ['user' => $result['data']]);
     }
 
-    #[OA\Post(
-        path: "/api/restore-account",
-        summary: "Demander la restauration (OTP)",
-        description: "Envoie un code de restauration si l'email correspond à un compte supprimé.",
-        tags: ["Auth"],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                properties: [new OA\Property(property: "email", type: "string", example: "admin@conceptic.io")]
-            )
-        ),
-        responses: [
-            new OA\Response(response: 200, description: "Code envoyé"),
-            new OA\Response(response: 404, description: "Utilisateur non trouvé")
-        ]
-    )]
+    public function showRestore()
+    {
+        return view('auth.restore');
+    }
+
+    public function showConfirmationRestore()
+    {
+        return view('auth.confirm-restore');
+    }
+
     public function requestRestoration(Request $request)
     {
-        $request->validate(['email' => 'required|email']);
-        
-        // Chercher l'utilisateur dans la corbeille uniquement
-        $user = User::onlyTrashed()->where('email', $request->email)->first();
 
-        if (!$user) {
-            return response()->json([
-                'message' => 'Aucun compte supprimé trouvé'
-            ], 404);
+        $result = $this->authService->requestRestoration($request->email);
+
+        if($request->expectsJson()) {
+            return response()->json($request, $result['status']);
         }
 
-        $code = rand(100000, 999999);
+        if(!$result['success']) {
+            return back()->withErrors($result['message']);
+        }
 
-        VerificationCode::create([
-            'user_id' => $user->id,
-            'code' => $code,
-            'expires_at' => now()->addMinutes(10)
-        ]);
+        session(['restore_email' =>$request->email]);
 
-        // On envoie le code par mail
-        Mail::to($user->email)->send(new RestoreAccountCode($code));
-
-        return response([
-            'success' =>true,
-            'message' => 'Un code de restauration a été envoyé sur votre boîte mail.'
-        ]);
+        return redirect()->route('confirm-restore.show')->with('success', $result['message']);
     }
 
-    #[OA\Post(
-        path: "/api/confirm-restore",
-        summary: "Confirmer la restauration",
-        description: "Valide le code OTP et restaure le compte (deleted_at -> null).",
-        tags: ["Auth"],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                properties: [
-                    new OA\Property(property: "email", type: "string"),
-                    new OA\Property(property: "code", type: "string", example: "123456")
-                ]
-            )
-        ),
-        responses: [
-            new OA\Response(response: 200, description: "Compte restauré"),
-            new OA\Response(response: 401, description: "Code invalide")
-        ]
-    )]
+    // Swagger
     public function confirmRestoration(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'code' => 'required|string|size:6'
-        ]);
+        $result = $this->authService->confirmRestoration($request->email, $request->code);
 
-        $user = User::onlyTrashed()->where('email', $request->email)->first();
+        if($request->expectsJson()) {
+            return response()->json($result, $result['status']);
+        }
 
+        if(!$result['success']) {
+            return back()->withErrors($result['message']);
+        }
+
+        //
+        session(['user_id' => $result['data']->id]);
+
+        return redirect()->route('me')->with('success', $result['message']);
+    }
+
+    // Lise des notifications
+    public function notifications(Request $request)
+    {
+        $user = $this->getAuthenticatedUser($request);
+
+        if(!$user) {
+            return redirect()->route('login.show')->with('error', 'Vous devez être connecté.');
+        }
+
+        $notifications = $user->notifications()
+                            ->latest()
+                            ->paginate(15);
+        
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'unread_count' => $user->unreadNotifications()->count(),
+                'notifications' => $notifications
+            ]);
+        }
+
+        return view('dashboard.notifications.index', compact('notifications'));
+    }
+
+    // Marquons une notification comme lue.
+    public function markAsRead(Request $request, string $id)
+    {
+        $user = $this->getAuthenticatedUser($request);
         if (!$user) {
             return response()->json([
-                'success' => false,
-                'message' => 'Utilisateur introuvable.'
-            ], 404);
+                'success' => false
+            ], 401);
         }
 
-        // Vérification de l'existence du code dans la table DE CODES
-        $verification = VerificationCode::where('user_id', $user->id)
-            ->where('code', $request->code)
-            ->where('expires_at', '>', now())
-            ->first();
+        $notification = $user->notifications()->findOrFail($id);
+        $notification->markAsRead();
 
-        if (!$verification) {
+        if ($request->expectsJson()) {
             return response()->json([
-                'success' => false,
-                'message' => 'Code invalide ou expiré'
-            ], 422);
+                'success' => true      
+            ]);
+        }
+        return back()->with('success', 'Notification marquée comme lue.');
+    }
+
+    // Marquons toutes comme lues
+    public function markAllAsRead(Request $request)
+    {
+        $user = $this->getAuthenticatedUser($request);
+        if ($user) {
+            return response()->json([
+                'success' => true
+            ]);
         }
 
-        // On restaure
-        $user->restore();
-
-        $user->notify(new \App\Notifications\AccountRestoreNotification());
-
-        // On supprime le code utilisé
-        $verification->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Compte restauré avec succès ! Vous pouvez maintenant vous connecter ou restaurer votre mot de passe.',
-            'can_login' => true
-        ]);
+        return back()->with('success', 'Toutes les notifications ont été marquées comme lues.');
     }
 
     #[OA\Post(
@@ -259,14 +336,25 @@ class AuthController extends Controller
             new OA\Response(response: 200, description: "Déconnexion réussie")
         ]
     )]
-    public function logout(Request $request): JsonResponse
+    public function logout(Request $request)
     {
-        // On passe l'objet User à la méthode logout du service
-        $this->authService->logout($request->user());
+        $user = $request->expectsJson() ? $request->user() : User::find(session('user_id'));
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Logged out successfully'
-        ]);
+        if($request->expectsJson()) {
+            if($user) {
+                $this->authService->logout($user, true);
+            }
+
+            return response()->json([
+                'success' =>true,
+                'message' =>'Déconnexion réussie',
+            ], 200);
+        }
+
+        $this->authService->logout($user, false);
+
+        session()->forget('user_id');
+
+        return redirect()->route('login.show')->with('success', 'Vous avez été déconnecté');
     }
 }
