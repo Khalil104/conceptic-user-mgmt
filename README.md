@@ -1,4 +1,4 @@
-# Laravel User Management API - Branche `test`
+# Conceptic User Management API - Branche `test`
 
 > Cette branche est conservée volontairement à des fins d'évaluation et de comparaison.
 >
@@ -29,12 +29,14 @@ Les principaux objectifs de cette version sont :
 ## Installation rapide
 
 ```bash
-git clone https://github.com/Web104/conceptic-user-mgmt.git (branch -> test)
+git clone https://github.com/Khalil104/conceptic-user-mgmt.git
+
 cd conceptic-user-mgmt
 
 composer install
 
 cp .env.example .env
+
 php artisan key:generate
 
 php artisan migrate --seed
